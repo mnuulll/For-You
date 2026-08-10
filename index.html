@@ -147,7 +147,16 @@
     margin-top:6px;
     display:block;
   }
-  .lock-note{ font-size:.85rem; opacity:.6; max-width:360px; margin-top:10px;}
+  .lock-note{ font-size:.85rem; opacity:.6; max-width:360px; margin-top:14px;}
+  #btn-reveal{ margin-top:6px; }
+  #btn-reveal:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    box-shadow:none;
+    transform:none;
+  }
+  #btn-reveal:disabled:hover{ transform:none; box-shadow:none; }
+  #btn-reveal.ready{ animation: giftPulse 1.5s ease-in-out infinite; }
 
   /* ---------- SURPRISE SCREEN (dark, festive) ---------- */
   #screen-surprise{
@@ -548,7 +557,8 @@
     <div class="cd-box"><span class="num" id="cd-mins">00</span><span class="lbl">Menit</span></div>
     <div class="cd-box"><span class="num" id="cd-secs">00</span><span class="lbl">Detik</span></div>
   </div>
-  <p class="lock-note">🔒 Halaman ini bakal kebuka otomatis begitu tanggal 13 Agustus jam 00.00 tiba.</p>
+  <button class="btn" id="btn-reveal" disabled>🔒 Tunggu Hitung Mundur Sampai 0</button>
+  <p class="lock-note">Tombolnya bakal aktif otomatis begitu tanggal 13 Agustus jam 00.00 tiba.</p>
 </section>
 
 <!-- ============ SCREEN 1: SURPRISE ============ -->
@@ -717,12 +727,41 @@
     return testMode || (new Date() >= TARGET);
   }
 
+  let countdownTimer = null;
+  const revealBtn = document.getElementById('btn-reveal');
+  const lockNote = document.querySelector('.lock-note');
+
+  function startCountdownTimer(){
+    if(countdownTimer) return;
+    countdownTimer = setInterval(tickCountdown, 1000);
+  }
+  function stopCountdownTimer(){
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+
+  function refreshLockState(){
+    if(isUnlocked()){
+      stopCountdownTimer();
+      ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id=>{
+        document.getElementById(id).textContent = '00';
+      });
+      revealBtn.disabled = false;
+      revealBtn.classList.add('ready');
+      revealBtn.textContent = '🎁 Buka Sekarang!';
+      lockNote.textContent = 'Yeay, waktunya udah sampai! Pencet tombol di atas ya~';
+    } else {
+      startCountdownTimer();
+      revealBtn.disabled = true;
+      revealBtn.classList.remove('ready');
+      revealBtn.textContent = '🔒 Tunggu Hitung Mundur Sampai 0';
+      lockNote.textContent = 'Tombolnya bakal aktif otomatis begitu tanggal 13 Agustus jam 00.00 tiba.';
+    }
+  }
+
   function tickCountdown(){
     if(isUnlocked()){
-      clearInterval(countdownTimer);
-      if(screens.countdown.classList.contains('active')){
-        celebrateMidnight();
-      }
+      refreshLockState();
       return;
     }
     const now = new Date();
@@ -737,18 +776,17 @@
     document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
     document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
   }
-  const countdownTimer = setInterval(tickCountdown, 1000);
+
+  refreshLockState();
   tickCountdown();
 
-  // initial route: if already unlocked on load, skip straight past countdown (calm entrance)
-  if(isUnlocked()){
-    showScreen('surprise');
-    spawnTwinkleStars();
-    document.getElementById('gift-box').classList.add('enter');
-    burstConfetti(50);
-  }
+  revealBtn.addEventListener('click', function(){
+    if(this.disabled) return;
+    this.disabled = true; // cegah dobel klik
+    celebrateMidnight();
+  });
 
-  /* ============= BIG MIDNIGHT CELEBRATION (live transition) ============= */
+  /* ============= BIG MIDNIGHT CELEBRATION (triggered by the button) ============= */
   function celebrateMidnight(){
     const flash = document.createElement('div');
     flash.className = 'flash-overlay';
@@ -808,11 +846,9 @@
   testBtn.addEventListener('click', function(){
     testMode = !testMode;
     testBtn.textContent = testMode ? '🔧 Mode Tes: AKTIF' : '🔧 Mode Tes: Lihat Preview';
-    if(testMode){
-      celebrateMidnight();
-    } else {
-      showScreen('countdown');
-    }
+    revealBtn.disabled = false; // reset in case it was clicked/locked before
+    showScreen('countdown');
+    refreshLockState();
   });
 
   /* ================= CONFETTI ================= */
@@ -1030,7 +1066,9 @@
     blowBtn.style.display = 'inline-block';
     relightBtn.style.display = 'none';
     gameStarted = false;
-    showScreen(testMode || isUnlocked() ? 'surprise' : 'countdown');
+    revealBtn.disabled = false;
+    showScreen('countdown');
+    refreshLockState();
   });
 
   /* ================= MUSIK (isi file kamu sendiri) ================= */
