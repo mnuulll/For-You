@@ -9,17 +9,17 @@
 <style>
   /* ============ CONFIG-ISH VARIABLES ============ */
   :root{
-    --cream:#FFF8F3;
-    --pink-soft:#FFD9EA;
-    --pink-mid:#FFB2D6;
-    --pink-deep:#FF6FA5;
-    --lavender:#C9B6FF;
-    --lavender-deep:#9E86E8;
-    --gold:#FFC857;
+    --cream:#FFF7EE;
+    --pink-soft:#FCDDC4;
+    --pink-mid:#F0AD94;
+    --pink-deep:#E17B60;
+    --lavender:#D8B48C;
+    --lavender-deep:#9C6B4F;
+    --gold:#F2B84E;
     --choco:#6B4226;
-    --text-dark:#54394B;
+    --text-dark:#5A4038;
     --white:#FFFFFF;
-    --shadow: 0 10px 30px rgba(255, 111, 165, 0.18);
+    --shadow: 0 10px 30px rgba(225, 123, 96, 0.18);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -29,9 +29,9 @@
     font-family:'Quicksand', sans-serif;
     color:var(--text-dark);
     background:
-      radial-gradient(circle at 15% 20%, #FFE7F2 0%, transparent 45%),
-      radial-gradient(circle at 85% 15%, #E9E1FF 0%, transparent 40%),
-      radial-gradient(circle at 50% 90%, #FFF1DC 0%, transparent 45%),
+      radial-gradient(circle at 15% 20%, #FCE3D2 0%, transparent 45%),
+      radial-gradient(circle at 85% 15%, #F7E4C8 0%, transparent 40%),
+      radial-gradient(circle at 50% 90%, #FFEFD9 0%, transparent 45%),
       var(--cream);
     overflow-x:hidden;
     position:relative;
@@ -162,9 +162,9 @@
   /* ---------- SURPRISE SCREEN (dark, festive) ---------- */
   #screen-surprise{
     background:
-      radial-gradient(circle at 20% 25%, rgba(255,111,165,.18) 0%, transparent 45%),
-      radial-gradient(circle at 80% 20%, rgba(158,134,232,.22) 0%, transparent 45%),
-      linear-gradient(180deg, #1B1230 0%, #150E24 60%, #100B1C 100%);
+      radial-gradient(circle at 20% 25%, rgba(225,123,96,.20) 0%, transparent 45%),
+      radial-gradient(circle at 80% 20%, rgba(242,184,78,.20) 0%, transparent 45%),
+      linear-gradient(180deg, #2A1B24 0%, #21151C 60%, #180F15 100%);
     border-radius:0;
     margin: -32px -18px -60px;
     padding: 60px 18px 90px;
@@ -240,7 +240,7 @@
     position:relative;
     width:min(92vw, 460px);
     height:min(60vh, 420px);
-    background: linear-gradient(180deg, #FDEFFA, #F3ECFF);
+    background: linear-gradient(180deg, #FFF3E6, #FCE9D6);
     border-radius:28px;
     border:2px solid var(--pink-soft);
     overflow:hidden;
@@ -312,8 +312,8 @@
     animation: specialPulse 1.8s ease-in-out infinite;
   }
   @keyframes specialPulse{
-    0%,100%{ box-shadow: 0 0 0 0 rgba(255,111,165,.5); }
-    50%{ box-shadow: 0 0 0 8px rgba(255,111,165,0); }
+    0%,100%{ box-shadow: 0 0 0 0 rgba(225,123,96,.5); }
+    50%{ box-shadow: 0 0 0 8px rgba(225,123,96,0); }
   }
   .cal-note{ font-size:.85rem; color:var(--lavender-deep); font-weight:600; margin-top:4px;}
   .cal-years{
@@ -325,6 +325,80 @@
     margin-bottom:2px;
   }
   .cal-years span{ color:var(--lavender-deep); }
+
+  /* ---------- ROADMAP SCREEN ---------- */
+  #screen-roadmap h2{ color:var(--pink-deep); font-size:clamp(1.5rem,5vw,2.2rem); margin-bottom:4px;}
+  .roadmap-card{
+    background:var(--white);
+    border-radius:26px;
+    padding:26px 24px 20px;
+    box-shadow:var(--shadow);
+    width:min(92vw, 420px);
+    margin: 22px 0 30px;
+  }
+  .roadmap-track{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .roadmap-item{
+    position:relative;
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
+    text-align:left;
+    padding-bottom:30px;
+  }
+  .roadmap-item:last-child{ padding-bottom:0; }
+  .roadmap-item::before{
+    content:'';
+    position:absolute;
+    left:23px;
+    top:48px;
+    bottom:-4px;
+    width:2px;
+    background:repeating-linear-gradient(180deg, var(--pink-soft) 0 6px, transparent 6px 12px);
+  }
+  .roadmap-item:last-child::before{ display:none; }
+  .roadmap-dot{
+    flex:0 0 auto;
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background: linear-gradient(135deg, var(--pink-deep), var(--lavender-deep));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.4rem;
+    box-shadow:var(--shadow);
+    position:relative;
+    z-index:1;
+  }
+  .roadmap-item.upcoming .roadmap-dot{
+    background:var(--white);
+    border:2px dashed var(--pink-mid);
+    box-shadow:none;
+  }
+  .roadmap-body{ padding-top:6px; }
+  .roadmap-label{
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    color:var(--pink-deep);
+    font-size:1.05rem;
+    display:block;
+  }
+  .roadmap-year{
+    font-size:.75rem;
+    letter-spacing:.5px;
+    color:var(--lavender-deep);
+    font-weight:700;
+    text-transform:uppercase;
+    display:block;
+    margin:2px 0 5px;
+  }
+  .roadmap-desc{ font-size:.92rem; opacity:.85; line-height:1.5; }
+  .roadmap-note{ font-size:.85rem; color:var(--lavender-deep); font-weight:600; max-width:400px; }
 
   /* ---------- CAKE SCREEN ---------- */
   #screen-cake h2{ color:var(--pink-deep); font-size:clamp(1.5rem,5vw,2.2rem); margin-bottom:4px;}
@@ -355,8 +429,24 @@
     0%{ opacity:.85; transform: translateY(0) scale(.6); }
     100%{ opacity:0; transform: translateY(-34px) scale(1.3); }
   }
-  .stick{ width:6px; height:26px; background: linear-gradient(180deg,#fff,#FFE1EF); border-radius:2px; }
-  .cake-body{ font-size:7rem; line-height:1; }
+  .stick{ width:6px; height:26px; background: linear-gradient(180deg,#fff,#FCE3D2); border-radius:2px; }
+  .cake-body{
+    font-size:7rem;
+    line-height:1;
+    cursor:pointer;
+    user-select:none;
+    display:inline-block;
+    transition: transform .25s cubic-bezier(.2,1.2,.4,1), filter .25s ease;
+  }
+  .cake-body:hover{ transform:scale(1.04); }
+  .cake-counter{
+    font-size:.85rem;
+    color:var(--lavender-deep);
+    font-weight:600;
+    margin:2px 0 0;
+    max-width:320px;
+  }
+  .cake-counter.full{ color:var(--pink-deep); }
   .blow-btn{ margin-top:8px; }
   .relight-btn{ margin-top:14px; font-size:.85rem; }
 
@@ -378,7 +468,7 @@
   }
   .env-body{
     position:absolute; inset:0;
-    background:linear-gradient(160deg,#FFFFFF,#FFE7F2);
+    background:linear-gradient(160deg,#FFFFFF,#FCE3D2);
     border:2px solid var(--pink-mid);
     border-radius:12px;
     box-shadow:var(--shadow);
@@ -467,7 +557,7 @@
     align-items:center;
     justify-content:center;
     gap:8px;
-    background: repeating-linear-gradient(135deg, #FDEFFA, #FDEFFA 10px, #FBE4F3 10px, #FBE4F3 20px);
+    background: repeating-linear-gradient(135deg, #FFF3E6, #FFF3E6 10px, #FBE6D3 10px, #FBE6D3 20px);
     color:var(--lavender-deep);
     font-size:.85rem;
     font-weight:600;
@@ -536,9 +626,9 @@
 
 <!-- ============ SCREEN 0: COUNTDOWN ============ -->
 <section class="screen active" id="screen-countdown">
-  <span class="eyebrow">Rahasia kecil untuk Naura</span>
+  <span class="eyebrow">Hadiah kecil untuk Naura</span>
   <h1>Ada sesuatu yang lagi disiapin... 💌</h1>
-  <p class="sub">Sabar ya, ini baru bisa dibuka pas harinya tiba. Countdown-nya jalan terus kok, dipantengin aja~</p>
+  <p class="sub">Sabar ya, ini baru bisa dibuka pas harinya tiba.</p>
   <div class="countdown-grid" id="countdown-grid">
     <div class="cd-box"><span class="num" id="cd-days">00</span><span class="lbl">Hari</span></div>
     <div class="cd-box"><span class="num" id="cd-hours">00</span><span class="lbl">Jam</span></div>
@@ -552,8 +642,8 @@
 <!-- ============ SCREEN 1: SURPRISE ============ -->
 <section class="screen" id="screen-surprise">
   <span class="eyebrow">Yeay, harinya udah datang!</span>
-  <h1>SELAMAT ULANG TAHUN, NAURA! 🎉</h1>
-  <p>Sekarang kamu resmi jadi anak <strong>14 tahun</strong>! Ada kado kecil buat kamu nih, buruan dibuka~</p>
+  <h1>HAPPY BIRTHDAY, NAURA! 🎉</h1>
+  <p>Sekarang naura resmi jadi anak <strong>14 tahun</strong>! Ada kado kecil buat kamu nih, buruan dibuka~</p>
   <div class="gift-wrap" id="fireworks-layer">
     <div class="gift" id="gift-box" role="button" tabindex="0" aria-label="Buka kado">🎁</div>
   </div>
@@ -565,7 +655,7 @@
 <section class="screen" id="screen-game">
   <span class="eyebrow">Isi kadonya adalah...</span>
   <h2>Mini Game! Tangkap Angka Sampai 14 🔢</h2>
-  <p class="sub">Pencetin angka 1 sampai 14 yang jatuh, biar genap nunjukin umur baru Naura!</p>
+  <p class="sub">Pencetin angka 1 sampai 14 yang jatuh, biar nunjukin umur baru Naura!</p>
   <div class="game-stats">
     <span>🔢 Angka: <span id="game-score">0</span>/14</span>
     <span>⏱️ Waktu: <span id="game-time">15</span>s</span>
@@ -574,7 +664,7 @@
     <div id="game-overlay-msg">
       <h3 id="game-result-title">Selesai!</h3>
       <p id="game-result-text"></p>
-      <button class="btn" id="btn-to-calendar">Lanjut ke Kalender 📅</button>
+      <button class="btn" id="btn-to-calendar">Lanjut...</button>
     </div>
   </div>
 </section>
@@ -582,13 +672,57 @@
 <!-- ============ SCREEN 3: CALENDAR ============ -->
 <section class="screen" id="screen-calendar">
   <span class="eyebrow">Tanggal cantik bulan ini</span>
-  <h2>Agustus, Bulan Spesialnya Naura 💗</h2>
+  <h2>Agustus adalah Bulan Spesialnya Naura 💗</h2>
   <div class="cal-card">
     <div class="cal-years">2012 <span>—</span> 2026</div>
-    <div class="cal-month">Agustus 2026</div>
+    <div class="cal-month">Agustus</div>
     <div class="cal-grid" id="cal-grid"></div>
   </div>
-  <p class="cal-note">✨ Tanggal 13 itu spesial banget, soalnya hari itu Naura lahir — udah 14 tahun perjalanannya!</p>
+  <p class="cal-note">✨ Tanggal 13 itu spesial banget, soalnya tanggal itu naura lahir. Gak terasa udah 14 tahun aja!</p>
+  <button class="btn" id="btn-to-roadmap" style="margin-top:22px;">Lanjut ke Perjalanannya 🌱</button>
+</section>
+
+<!-- ============ SCREEN 3.5: ROADMAP ============ -->
+<section class="screen" id="screen-roadmap">
+  <span class="eyebrow">Sekilas perjalanan Naura</span>
+  <h2>14 Tahun, Segini Jauhnya Udah Ditempuh 🌱</h2>
+  <div class="roadmap-card">
+    <div class="roadmap-track">
+      <div class="roadmap-item">
+        <div class="roadmap-dot">🍼</div>
+        <div class="roadmap-body">
+          <span class="roadmap-label">Lahir</span>
+          <span class="roadmap-year">2012</span>
+          <p class="roadmap-desc">Awal dari semuanya, Naura hadir ke dunia.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot">🎒</div>
+        <div class="roadmap-body">
+          <span class="roadmap-label">SD</span>
+          <span class="roadmap-year">± 2019</span>
+          <p class="roadmap-desc">Mulai belajar hal baru, main sama teman-teman pertama.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot">📚</div>
+        <div class="roadmap-body">
+          <span class="roadmap-label">SMP</span>
+          <span class="roadmap-year">± 2024</span>
+          <p class="roadmap-desc">Makin dewasa, makin banyak cerita dan warna baru.</p>
+        </div>
+      </div>
+      <div class="roadmap-item upcoming">
+        <div class="roadmap-dot">🏫</div>
+        <div class="roadmap-body">
+          <span class="roadmap-label">SMA/SMK</span>
+          <span class="roadmap-year">Segera</span>
+          <p class="roadmap-desc">Babak baru yang bakal seru buat dijalani, semangat ya!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="roadmap-note">Sejauh apapun jalannya, semua Naura — yang dulu, sekarang, dan nanti — tetap layak dirayakan 💗</p>
   <button class="btn" id="btn-to-cake" style="margin-top:22px;">Lanjut ke Kue 🎂</button>
 </section>
 
@@ -598,8 +732,9 @@
   <h2>Waktunya Niup Lilin! 🕯️</h2>
   <div class="cake-wrap">
     <div class="candles" id="candles"></div>
-    <div class="cake-body">🎂</div>
+    <div class="cake-body" id="cake-body" role="button" tabindex="0" aria-label="Gigit kuenya">🎂</div>
   </div>
+  <p class="cake-counter" id="cake-counter">🍴 Gigitan: <span id="bite-count">0</span>/8 — klik kuenya, coba digigit~</p>
   <button class="btn blow-btn" id="btn-blow">🌬️ Tiup Lilinnya</button>
   <button class="btn secondary relight-btn" id="btn-relight" style="display:none;">🔥 Nyalain Lagi</button>
 
@@ -609,14 +744,14 @@
       <div class="env-body"></div>
       <div class="env-letter">💌</div>
     </div>
-    <div class="envelope-hint">✉️ Ada surat buat kamu, pencet buat buka</div>
+    <div class="envelope-hint">✉️ Ada surat buat naura, pencet buat buka</div>
   </div>
 
   <div class="cake-msg" id="cake-msg">
-    <p>Naura, met ulang tahun ya! 🎉 Sekarang udah resmi <strong>14 tahun</strong>, makin gede, makin keren, dan semoga makin jago di segala hal yang kamu suka.</p>
+    <p>Naura, met ulang tahun ya! 🎉 Sekarang naura udah resmi <strong>14 tahun</strong>, makin gede, makin keren, dan semoga makin jago di segala hal yang kamu suka.</p>
     <p>Semoga tahun ini banyak hal baik yang dateng ke kamu, cita-cita kamu pelan-pelan kewujud, sehat terus, dan tetep jadi orang yang seru & baik kayak sekarang. Makasih juga udah jadi teman yang asik selama ini.</p>
     <p>Sekali lagi, selamat ulang tahun, Naura! Semoga harimu semenyenangkan yang kamu bayangin 🎈🎂</p>
-    <div class="signoff">— dari aku</div>
+    <div class="signoff">— dari ka manul</div>
   </div>
 
   <button class="btn secondary" id="btn-to-end" style="margin-top:26px; display:none;">Lanjut ↓</button>
@@ -625,8 +760,8 @@
 <!-- ============ SCREEN 5: END ============ -->
 <section class="screen" id="screen-end">
   <span class="eyebrow">Sekian dulu</span>
-  <h2>Makasih Udah Mampir 💐</h2>
-  <p>Website kecil ini dibuat khusus buat ngerayain hari spesialnya Naura. Semoga suka ya!</p>
+  <h2>Makasih Udah mau liat 💐</h2>
+  <p>Website kecil ini dibuat khusus buat ngerayain hari spesial kamu Naura. Semoga suka ya!</p>
 
   <!--
     TAMBAHIN FOTO NAURA DI SINI:
@@ -643,14 +778,14 @@
     </div>
     <div class="photo-caption">Naura, 14 Tahun 🎉</div>
     <svg class="party-hat" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="50,0 15,100 85,100" fill="#FF6FA5"/>
+      <polygon points="50,0 15,100 85,100" fill="#E17B60"/>
       <polygon points="50,0 15,100 85,100" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6,8"/>
-      <circle cx="50" cy="30" r="6" fill="#FFC857"/>
-      <circle cx="35" cy="55" r="6" fill="#FFC857"/>
-      <circle cx="65" cy="55" r="6" fill="#FFC857"/>
-      <circle cx="50" cy="80" r="6" fill="#FFC857"/>
-      <circle cx="50" cy="-6" r="12" fill="#C9B6FF"/>
-      <ellipse cx="50" cy="102" rx="38" ry="7" fill="#FFB2D6"/>
+      <circle cx="50" cy="30" r="6" fill="#F2B84E"/>
+      <circle cx="35" cy="55" r="6" fill="#F2B84E"/>
+      <circle cx="65" cy="55" r="6" fill="#F2B84E"/>
+      <circle cx="50" cy="80" r="6" fill="#F2B84E"/>
+      <circle cx="50" cy="-6" r="12" fill="#D8B48C"/>
+      <ellipse cx="50" cy="102" rx="38" ry="7" fill="#F0AD94"/>
     </svg>
   </div>
 
@@ -688,6 +823,7 @@
     surprise: document.getElementById('screen-surprise'),
     game: document.getElementById('screen-game'),
     calendar: document.getElementById('screen-calendar'),
+    roadmap: document.getElementById('screen-roadmap'),
     cake: document.getElementById('screen-cake'),
     end: document.getElementById('screen-end'),
   };
@@ -700,7 +836,7 @@
 
   /* ================= AMBIENT FLOATERS ================= */
   const ambient = document.getElementById('ambient');
-  const floatEmojis = ['🎀','✨','💗','🩷','⭐','💫'];
+  const floatEmojis = ['✨','🕯️','🌙','⭐','🤎','💫'];
   for(let i=0;i<14;i++){
     const el = document.createElement('div');
     el.className = 'float-item';
@@ -814,7 +950,7 @@
   }
 
   function spawnFirework(leftPercent, topPercent){
-    const colors = ['#FF6FA5','#FFC857','#C9B6FF','#FFFFFF','#9E86E8'];
+    const colors = ['#E17B60','#F2B84E','#F0AD94','#FFFFFF','#9C6B4F'];
     const originX = window.innerWidth * (leftPercent/100);
     const originY = window.innerHeight * (topPercent/100);
     const count = 16;
@@ -847,7 +983,7 @@
 
   /* ================= CONFETTI ================= */
   function burstConfetti(count){
-    const colors = ['#FF6FA5','#C9B6FF','#FFC857','#FFD9EA','#9E86E8'];
+    const colors = ['#E17B60','#F2B84E','#F0AD94','#FCDDC4','#9C6B4F'];
     for(let i=0;i<count;i++){
       const piece = document.createElement('div');
       piece.className = 'confetti-piece';
@@ -987,6 +1123,10 @@
   }
   buildCalendar();
 
+  document.getElementById('btn-to-roadmap').addEventListener('click', function(){
+    showScreen('roadmap');
+  });
+
   document.getElementById('btn-to-cake').addEventListener('click', function(){
     showScreen('cake');
   });
@@ -1004,6 +1144,45 @@
   const blowBtn = document.getElementById('btn-blow');
   const relightBtn = document.getElementById('btn-relight');
   let candlesBlown = false;
+
+  /* ============= KLIK KUE: GIGIT / NAMBAH-BERKURANG ============= */
+  const cakeBodyEl = document.getElementById('cake-body');
+  const cakeCounterEl = document.getElementById('cake-counter');
+  const MAX_BITES = 8;
+  let cakeBites = 0;
+
+  function renderCakeBites(){
+    const scale = 1 - cakeBites*0.06;
+    cakeBodyEl.style.transform = `scale(${scale})`;
+    cakeBodyEl.style.filter = cakeBites>0 ? `saturate(${Math.max(1 - cakeBites*0.08,0.4)})` : 'none';
+    if(cakeBites >= MAX_BITES){
+      cakeCounterEl.classList.add('full');
+      cakeCounterEl.innerHTML = '😋 Habis dimakan! Klik lagi buat kue baru~';
+    } else {
+      cakeCounterEl.classList.remove('full');
+      cakeCounterEl.innerHTML = `🍴 Gigitan: <span id="bite-count">${cakeBites}</span>/${MAX_BITES} — klik kuenya, coba digigit~`;
+    }
+  }
+
+  function nibbleCake(){
+    if(cakeBites >= MAX_BITES){
+      cakeBites = 0; // kuenya nambah lagi, baru!
+    } else {
+      cakeBites++;
+    }
+    renderCakeBites();
+    const pop = document.createElement('div');
+    pop.className = 'pop-plus';
+    pop.textContent = cakeBites === 0 ? '🎂' : '-1 gigit';
+    const rect = cakeBodyEl.getBoundingClientRect();
+    pop.style.position = 'fixed';
+    pop.style.left = (rect.left + rect.width/2 - 20) + 'px';
+    pop.style.top = rect.top + 'px';
+    document.body.appendChild(pop);
+    setTimeout(()=>pop.remove(), 650);
+  }
+  cakeBodyEl.addEventListener('click', nibbleCake);
+  cakeBodyEl.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' ') nibbleCake(); });
 
   blowBtn.addEventListener('click', function(){
     if(candlesBlown) return;
@@ -1070,6 +1249,8 @@
     candlesBlown = false;
     blowBtn.style.display = 'inline-block';
     relightBtn.style.display = 'none';
+    cakeBites = 0;
+    renderCakeBites();
     gameStarted = false;
     revealBtn.disabled = false;
     showScreen('countdown');
