@@ -23,6 +23,7 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{overflow-x:hidden; width:100%;}
   body{
     min-height:100vh;
     font-family:'Quicksand', sans-serif;
@@ -167,7 +168,8 @@
     border-radius:0;
     margin: -32px -18px -60px;
     padding: 60px 18px 90px;
-    width:100vw;
+    width:auto;
+    max-width:none;
     position:relative;
     overflow:hidden;
   }
@@ -210,6 +212,7 @@
     50%{ transform: scale(1.06); }
   }
   .gift-hint{ margin-top:18px; font-size:.9rem; color:var(--gold); font-weight:600; position:relative; z-index:2; }
+  .song-credit{ margin-top:10px; font-size:.78rem; color:#F1E9FF; opacity:.65; position:relative; z-index:2; letter-spacing:.3px; }
 
   /* fireworks */
   .firework{ position:absolute; width:6px; height:6px; border-radius:50%; pointer-events:none; z-index:1; }
@@ -491,21 +494,6 @@
     filter: drop-shadow(0 6px 8px rgba(0,0,0,.15));
     pointer-events:none;
   }
-  .music-toggle{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    z-index:50;
-    background:var(--white);
-    border-radius:50%;
-    width:54px; height:54px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.4rem;
-    box-shadow:var(--shadow);
-    border:2px solid var(--pink-soft);
-  }
-  .music-toggle.no-track{ opacity:.45; cursor:not-allowed; }
-
   /* dev/test toggle */
   .test-toggle{
     position:fixed;
@@ -570,15 +558,16 @@
     <div class="gift" id="gift-box" role="button" tabindex="0" aria-label="Buka kado">🎁</div>
   </div>
   <div class="gift-hint">👆 pencet kadonya</div>
+  <div class="song-credit">🎵 Semua Aku Dirayakan — Nadin Amizah</div>
 </section>
 
 <!-- ============ SCREEN 2: MINIGAME ============ -->
 <section class="screen" id="screen-game">
   <span class="eyebrow">Isi kadonya adalah...</span>
-  <h2>Mini Game! Tangkap Bintangnya ⭐</h2>
-  <p class="sub">Pencetin bintang-bintang yang jatuh selama 15 detik. Gampang kok, isengin aja!</p>
+  <h2>Mini Game! Tangkap Angka Sampai 14 🔢</h2>
+  <p class="sub">Pencetin angka 1 sampai 14 yang jatuh, biar genap nunjukin umur baru Naura!</p>
   <div class="game-stats">
-    <span>⭐ Skor: <span id="game-score">0</span></span>
+    <span>🔢 Angka: <span id="game-score">0</span>/14</span>
     <span>⏱️ Waktu: <span id="game-time">15</span>s</span>
   </div>
   <div class="game-area" id="game-area">
@@ -670,11 +659,13 @@
 
 <!--
   TAMBAHIN LAGU KAMU DI SINI:
-  1. Taruh file lagu (mp3) di folder yang sama dengan file HTML ini, misal namanya "musik.mp3"
-  2. Ganti src="musik.mp3" di bawah ini sesuai nama filenya
+  Lagu yang dipakai: "Semua Aku Dirayakan" - Nadin Amizah
+  1. Download file mp3 lagunya sendiri (dari platform resmi/yang kamu punya), lalu taruh
+     di folder yang sama dengan file HTML ini dengan nama "semua-aku-dirayakan.mp3"
+  2. Kalau mau pakai nama file lain, tinggal sesuaikan src="semua-aku-dirayakan.mp3" di bawah ini
+  Musiknya bakal otomatis nyala begitu tombol "Buka Sekarang!" dipencet (gak perlu tombol musik terpisah).
 -->
-<audio id="bg-music" src="musik.mp3" loop preload="none"></audio>
-<button class="music-toggle" id="music-toggle" aria-label="Putar musik" title="Putar musik">🔇</button>
+<audio id="bg-music" src="semua-aku-dirayakan.mp3" loop preload="none"></audio>
 <button class="test-toggle" id="test-toggle">🔧 Mode Tes: Lihat Preview</button>
 
 <script>
@@ -793,6 +784,9 @@
     document.body.appendChild(flash);
     setTimeout(()=>flash.remove(), 550);
 
+    // musik otomatis nyala (ini dipicu dari klik tombol, jadi diizinkan browser)
+    bgMusic.play().catch(()=>{ /* file lagunya belum ditaruh / nama file beda */ });
+
     showScreen('surprise');
     spawnTwinkleStars();
     document.getElementById('gift-box').classList.add('enter');
@@ -883,28 +877,31 @@
   giftBox.addEventListener('click', openGift);
   giftBox.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' ') openGift(); });
 
-  /* ================= MINI GAME: TANGKAP BINTANG ================= */
+  /* ================= MINI GAME: TANGKAP ANGKA SAMPAI 14 ================= */
   const gameArea = document.getElementById('game-area');
   const scoreEl = document.getElementById('game-score');
   const timeEl = document.getElementById('game-time');
   const overlay = document.getElementById('game-overlay-msg');
+  const TOTAL_NUMBERS = 14;
   let gameScore = 0;
   let gameTimeLeft = 15;
+  let numberIndex = 0;
   let gameSpawnInterval = null;
   let gameCountdownInterval = null;
   let gameStarted = false;
-  const starEmojis = ['⭐','🌟','💖','🎀'];
 
   function startMiniGame(){
     if(gameStarted) return;
     gameStarted = true;
     gameScore = 0;
+    numberIndex = 0;
     gameTimeLeft = 15;
     scoreEl.textContent = '0';
     timeEl.textContent = '15';
     overlay.style.display = 'none';
 
-    gameSpawnInterval = setInterval(spawnStar, 650);
+    spawnNumber(); // langsung munculin angka 1
+    gameSpawnInterval = setInterval(spawnNumber, 1000);
     gameCountdownInterval = setInterval(()=>{
       gameTimeLeft--;
       timeEl.textContent = gameTimeLeft;
@@ -912,31 +909,37 @@
     }, 1000);
   }
 
-  function spawnStar(){
+  function spawnNumber(){
     if(!gameArea.isConnected) return;
-    const star = document.createElement('div');
-    star.className = 'star-item';
-    star.textContent = starEmojis[Math.floor(Math.random()*starEmojis.length)];
+    if(numberIndex >= TOTAL_NUMBERS){
+      clearInterval(gameSpawnInterval);
+      return;
+    }
+    numberIndex++;
+    const num = document.createElement('div');
+    num.className = 'star-item';
+    num.textContent = numberIndex;
     const areaWidth = gameArea.clientWidth;
-    star.style.left = (Math.random()*(areaWidth-40))+'px';
+    num.style.left = (Math.random()*(areaWidth-40))+'px';
     const duration = 2.6 + Math.random()*1.6;
-    star.style.animationDuration = duration+'s';
-    gameArea.appendChild(star);
+    num.style.animationDuration = duration+'s';
+    gameArea.appendChild(num);
 
-    star.addEventListener('click', function(){
+    num.addEventListener('click', function(){
       gameScore++;
       scoreEl.textContent = gameScore;
       const plus = document.createElement('div');
       plus.className = 'pop-plus';
       plus.textContent = '+1';
-      plus.style.left = star.style.left;
-      plus.style.top = star.getBoundingClientRect().top - gameArea.getBoundingClientRect().top + 'px';
+      plus.style.left = num.style.left;
+      plus.style.top = num.getBoundingClientRect().top - gameArea.getBoundingClientRect().top + 'px';
       gameArea.appendChild(plus);
       setTimeout(()=>plus.remove(), 650);
-      star.remove();
+      num.remove();
+      if(gameScore >= TOTAL_NUMBERS) endMiniGame();
     });
 
-    setTimeout(()=>{ if(star.isConnected) star.remove(); }, duration*1000 + 100);
+    setTimeout(()=>{ if(num.isConnected) num.remove(); }, duration*1000 + 100);
   }
 
   function endMiniGame(){
@@ -944,9 +947,11 @@
     clearInterval(gameCountdownInterval);
     document.querySelectorAll('.star-item').forEach(s=>s.remove());
     document.getElementById('game-result-title').textContent =
-      gameScore >= 12 ? 'Wih jago banget! 🏆' : gameScore >= 6 ? 'Lumayan seru kan? 🎉' : 'Selesai! 🌟';
+      gameScore >= TOTAL_NUMBERS ? 'Lengkap, 14! 🏆' : gameScore >= 8 ? 'Dikit lagi ke 14! 🎉' : 'Selesai! 🌟';
     document.getElementById('game-result-text').textContent =
-      `Skor kamu: ${gameScore} bintang. Yuk lanjut ke bagian berikutnya!`;
+      gameScore >= TOTAL_NUMBERS
+        ? `Semua angka ketangkep! Resmi deh, Naura sekarang 14 tahun 🎂`
+        : `Kamu nangkep ${gameScore} dari ${TOTAL_NUMBERS} angka. Tapi tenang, umurnya tetep resmi 14 tahun kok!`;
     overlay.style.display = 'flex';
   }
 
@@ -1073,25 +1078,6 @@
 
   /* ================= MUSIK (isi file kamu sendiri) ================= */
   const bgMusic = document.getElementById('bg-music');
-  const musicBtn = document.getElementById('music-toggle');
-  let musicPlaying = false;
-  musicBtn.addEventListener('click', function(){
-    if(!musicPlaying){
-      bgMusic.play().then(()=>{
-        musicPlaying = true;
-        musicBtn.textContent = '🔊';
-        musicBtn.classList.remove('no-track');
-      }).catch(()=>{
-        // file lagunya belum ditaruh / belum diganti namanya di src audio
-        musicBtn.classList.add('no-track');
-        alert('Lagunya belum ketemu. Taruh file mp3 di folder yang sama dan sesuaikan src="musik.mp3" di HTML ya.');
-      });
-    } else {
-      bgMusic.pause();
-      musicPlaying = false;
-      musicBtn.textContent = '🔇';
-    }
-  });
 
 })();
 </script>
