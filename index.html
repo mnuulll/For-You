@@ -157,7 +157,7 @@
     transform:none;
   }
   #btn-reveal:disabled:hover{ transform:none; box-shadow:none; }
-  #btn-reveal.ready{ animation: giftPulse 1.5s ease-in-out infinite; }
+  #btn-reveal.ready{ }
 
   /* ---------- SURPRISE SCREEN (dark, festive) ---------- */
   #screen-surprise{
@@ -325,6 +325,99 @@
     margin-bottom:2px;
   }
   .cal-years span{ color:var(--lavender-deep); }
+  .elapsed-wrap{ margin-top:18px; }
+  .elapsed-label{ font-size:.8rem; color:var(--lavender-deep); font-weight:700; letter-spacing:.5px; margin-bottom:10px; display:block;}
+  .elapsed-grid{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .elapsed-box{
+    background:var(--white);
+    border-radius:16px;
+    padding:14px 10px;
+    min-width:130px;
+    flex:1 1 130px;
+    box-shadow:var(--shadow);
+    border:2px solid var(--pink-soft);
+  }
+  .elapsed-box .num{
+    font-family:'Fredoka', sans-serif;
+    font-size:1.5rem;
+    font-weight:700;
+    color:var(--pink-deep);
+    line-height:1;
+    display:block;
+    white-space:nowrap;
+  }
+  .elapsed-box .lbl{
+    font-size:.68rem;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:var(--lavender-deep);
+    margin-top:5px;
+    display:block;
+  }
+  .wish-wrap{
+    margin-top:36px;
+    max-width:440px;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .wish-label{
+    font-size:.98rem;
+    margin-bottom:14px;
+    color:var(--text-dark);
+  }
+  .wish-textarea{
+    width:100%;
+    min-height:86px;
+    border-radius:18px;
+    border:2px solid var(--pink-soft);
+    padding:14px 16px;
+    font-family:'Quicksand', sans-serif;
+    font-size:.95rem;
+    color:var(--text-dark);
+    background:var(--white);
+    resize:vertical;
+    box-shadow:var(--shadow);
+  }
+  .wish-textarea:focus{ outline:none; border-color:var(--pink-deep); }
+  #btn-wish-send{ margin-top:16px; }
+  .wish-reply{
+    margin-top:18px;
+    font-size:.98rem;
+    font-weight:600;
+    color:var(--pink-deep);
+    max-width:400px;
+    min-height:0;
+    opacity:0;
+    transform:translateY(8px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .wish-reply.show{ opacity:1; transform:translateY(0); }
+  .elapsed-heart{
+    font-size:.9rem;
+    color:var(--text-dark);
+    opacity:.85;
+    font-style:italic;
+    max-width:340px;
+    margin:14px auto 0;
+    line-height:1.5;
+  }
+  .elapsed-heart .beat{
+    display:inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+  @keyframes heartbeat{
+    0%,100%{ transform:scale(1); }
+    25%{ transform:scale(1.2); }
+    40%{ transform:scale(1); }
+    60%{ transform:scale(1.12); }
+  }
 
   /* ---------- ROADMAP SCREEN ---------- */
   #screen-roadmap h2{ color:var(--pink-deep); font-size:clamp(1.5rem,5vw,2.2rem); margin-bottom:4px;}
@@ -359,7 +452,11 @@
     bottom:-4px;
     width:2px;
     background:repeating-linear-gradient(180deg, var(--pink-soft) 0 6px, transparent 6px 12px);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform .55s ease;
   }
+  .roadmap-item.line-grown::before{ transform: scaleY(1); }
   .roadmap-item:last-child::before{ display:none; }
   .roadmap-dot{
     flex:0 0 auto;
@@ -374,13 +471,31 @@
     box-shadow:var(--shadow);
     position:relative;
     z-index:1;
+    opacity:0;
+    transform: scale(.3);
+    transition: opacity .4s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .roadmap-item.revealed .roadmap-dot{
+    opacity:1;
+    transform: scale(1);
+    animation: dotSettle .5s ease;
+  }
+  @keyframes dotSettle{
+    0%{ box-shadow: 0 0 0 0 rgba(225,123,96,.45); }
+    100%{ box-shadow: 0 0 0 10px rgba(225,123,96,0); }
   }
   .roadmap-item.upcoming .roadmap-dot{
     background:var(--white);
     border:2px dashed var(--pink-mid);
     box-shadow:none;
   }
-  .roadmap-body{ padding-top:6px; }
+  .roadmap-body{
+    padding-top:6px;
+    opacity:0;
+    transform: translateX(-12px);
+    transition: opacity .45s ease .08s, transform .45s ease .08s;
+  }
+  .roadmap-item.revealed .roadmap-body{ opacity:1; transform:translateX(0); }
   .roadmap-label{
     font-family:'Fredoka', sans-serif;
     font-weight:700;
@@ -518,22 +633,35 @@
   #screen-end h2{ color:var(--lavender-deep); margin-bottom:10px; }
   #screen-end p{ max-width:400px; margin-bottom:24px; }
 
-  /* ---------- PHOTO + PARTY HAT ----------
-     Cara nyesuaiin posisi topi biar pas di kepala:
-     ubah 3 variabel di bawah ini (nilainya % dari lebar/tinggi foto):
+  /* ---------- PHOTO + PARTY HAT DRAG GAME ----------
+     Cara nyesuaiin posisi target topi (garis putus-putus) biar pas di kepala:
+     ubah 3 variabel di CSS class .hat-game-wrap di bawah ini (nilainya % dari lebar/tinggi foto):
      --hat-left  : geser kiri-kanan
      --hat-top   : geser atas-bawah
      --hat-rotate: miringin topinya
   */
-  .photo-frame{
+  .hat-game-wrap{
     --hat-left: 50%;
     --hat-top: -6%;
     --hat-rotate: -12deg;
     --hat-scale: 1;
     position:relative;
     width:min(80vw, 300px);
+    margin: 8px auto 10px;
+  }
+  .hat-hint{
+    font-size:.85rem;
+    color:var(--lavender-deep);
+    font-weight:700;
+    margin-bottom:12px;
+    transition: color .3s ease;
+  }
+  .hat-hint.done{ color:var(--pink-deep); }
+  .photo-frame{
+    position:relative;
+    width:100%;
     aspect-ratio: 4/5;
-    margin: 8px auto 26px;
+    margin: 0 auto 26px;
     background: var(--white);
     border-radius:18px;
     padding:14px 14px 34px;
@@ -573,16 +701,48 @@
     color:var(--pink-deep);
     font-size:.95rem;
   }
-  .party-hat{
+  .hat-target{
     position:absolute;
     top:var(--hat-top);
     left:var(--hat-left);
     width:92px;
+    height:110px;
     transform: translate(-50%,0) rotate(var(--hat-rotate)) scale(var(--hat-scale));
     transform-origin: bottom center;
-    z-index:5;
-    filter: drop-shadow(0 6px 8px rgba(0,0,0,.15));
     pointer-events:none;
+    z-index:4;
+    opacity:.65;
+    transition: opacity .35s ease;
+    animation: hatTargetPulse 1.8s ease-in-out infinite;
+  }
+  .hat-target.filled{ opacity:0; animation:none; }
+  @keyframes hatTargetPulse{
+    0%,100%{ opacity:.5; }
+    50%{ opacity:.85; }
+  }
+  .party-hat-drag{
+    position:absolute;
+    top:255px;
+    left:-16px;
+    width:88px;
+    cursor:grab;
+    touch-action:none;
+    z-index:10;
+    transition: transform .45s cubic-bezier(.2,1.4,.4,1);
+    animation: hatBeckon 1.6s ease-in-out infinite;
+  }
+  .party-hat-drag.dragging{ cursor:grabbing; transition:none; animation:none; }
+  .party-hat-drag.placed{ cursor:default; animation:none; }
+  .party-hat-drag .party-hat-svg{
+    display:block;
+    width:100%;
+    transform: rotate(var(--hat-rotate)) scale(var(--hat-scale));
+    transform-origin: bottom center;
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,.18));
+  }
+  @keyframes hatBeckon{
+    0%,100%{ transform: translate(0,0); }
+    50%{ transform: translate(4px,-8px); }
   }
   /* dev/test toggle */
   .test-toggle{
@@ -626,17 +786,17 @@
 
 <!-- ============ SCREEN 0: COUNTDOWN ============ -->
 <section class="screen active" id="screen-countdown">
-  <span class="eyebrow">Hadiah kecil untuk Naura</span>
-  <h1>Ada sesuatu yang lagi disiapin... 💌</h1>
-  <p class="sub">Sabar ya, ini baru bisa dibuka pas harinya tiba.</p>
+  <span class="eyebrow">Untuk Naura</span>
+  <h1>Ada yang Lagi Disiapin...</h1>
+  <p class="sub">Sabar ya, ini baru bisa diakses nanti.</p>
   <div class="countdown-grid" id="countdown-grid">
     <div class="cd-box"><span class="num" id="cd-days">00</span><span class="lbl">Hari</span></div>
     <div class="cd-box"><span class="num" id="cd-hours">00</span><span class="lbl">Jam</span></div>
     <div class="cd-box"><span class="num" id="cd-mins">00</span><span class="lbl">Menit</span></div>
     <div class="cd-box"><span class="num" id="cd-secs">00</span><span class="lbl">Detik</span></div>
   </div>
-  <button class="btn" id="btn-reveal" disabled>🔒 Tunggu Hitung Mundur Sampai 0</button>
-  <p class="lock-note">Tombolnya bakal aktif otomatis begitu tanggal 13 Agustus jam 00.00 tiba.</p>
+  <button class="btn" id="btn-reveal" disabled>🔒 Belum Bisa Diakses</button>
+  <p class="lock-note">Tombolnya bakal aktif otomatis begitu waktunya tiba.</p>
 </section>
 
 <!-- ============ SCREEN 1: SURPRISE ============ -->
@@ -679,6 +839,16 @@
     <div class="cal-grid" id="cal-grid"></div>
   </div>
   <p class="cal-note">✨ Tanggal 13 itu spesial banget, soalnya tanggal itu naura lahir. Gak terasa udah 14 tahun aja!</p>
+  <div class="elapsed-wrap">
+    <span class="elapsed-label">⏳ Udah segini lama Naura ada di dunia</span>
+    <div class="elapsed-grid" id="elapsed-grid">
+      <div class="elapsed-box"><span class="num" id="el-hours">0</span><span class="lbl">Jam</span></div>
+      <div class="elapsed-box"><span class="num" id="el-days">0</span><span class="lbl">Hari</span></div>
+      <div class="elapsed-box"><span class="num" id="el-weeks">0</span><span class="lbl">Minggu</span></div>
+      <div class="elapsed-box"><span class="num" id="el-months">0</span><span class="lbl">Bulan</span></div>
+    </div>
+    <p class="elapsed-heart">Sepanjang itu, dan di setiap harinya, Naura selalu layak buat dirayakan <span class="beat">💗</span></p>
+  </div>
   <button class="btn" id="btn-to-roadmap" style="margin-top:22px;">Lanjut ke Perjalanannya 🌱</button>
 </section>
 
@@ -767,26 +937,43 @@
     TAMBAHIN FOTO NAURA DI SINI:
     1. Taruh file fotonya (jpg/png) di folder yang sama dengan HTML ini, misal "foto-naura.jpg"
     2. Ganti src="foto-naura.jpg" di bawah sesuai nama filenya
-    3. Kalau topinya belum pas di kepalanya, atur variabel --hat-left / --hat-top / --hat-rotate
-       di CSS class .photo-frame (ada penjelasannya di bagian <style>)
+    3. Kalau target topinya (garis putus-putus) belum pas di kepalanya, atur variabel
+       --hat-left / --hat-top / --hat-rotate di CSS class .hat-game-wrap (ada penjelasannya di bagian <style>)
   -->
-  <div class="photo-frame">
-    <img src="foto-naura.jpg" alt="Foto Naura"
-      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-    <div class="photo-placeholder" style="display:none;">
-      📸<br>Taruh foto Naura di sini<br>(foto-naura.jpg)
+  <div class="hat-game-wrap">
+    <p class="hat-hint" id="hat-hint">🎉 Seret topinya ke atas kepala Naura!</p>
+    <div class="photo-frame" id="photo-frame">
+      <img src="foto-naura.jpg" alt="Foto Naura"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="photo-placeholder" style="display:none;">
+        📸<br>Taruh foto Naura di sini<br>(foto-naura.jpg)
+      </div>
+      <div class="photo-caption">Naura, 14 Tahun 🎉</div>
+      <svg class="hat-target" id="hat-target" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="50,0 15,100 85,100" fill="none" stroke="var(--lavender-deep)" stroke-width="4" stroke-dasharray="7,8"/>
+        <circle cx="50" cy="-6" r="11" fill="none" stroke="var(--lavender-deep)" stroke-width="4" stroke-dasharray="4,6"/>
+        <ellipse cx="50" cy="102" rx="38" ry="7" fill="none" stroke="var(--lavender-deep)" stroke-width="3" stroke-dasharray="5,6"/>
+      </svg>
     </div>
-    <div class="photo-caption">Naura, 14 Tahun 🎉</div>
-    <svg class="party-hat" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="50,0 15,100 85,100" fill="#E17B60"/>
-      <polygon points="50,0 15,100 85,100" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6,8"/>
-      <circle cx="50" cy="30" r="6" fill="#F2B84E"/>
-      <circle cx="35" cy="55" r="6" fill="#F2B84E"/>
-      <circle cx="65" cy="55" r="6" fill="#F2B84E"/>
-      <circle cx="50" cy="80" r="6" fill="#F2B84E"/>
-      <circle cx="50" cy="-6" r="12" fill="#D8B48C"/>
-      <ellipse cx="50" cy="102" rx="38" ry="7" fill="#F0AD94"/>
-    </svg>
+    <div class="party-hat-drag" id="party-hat-drag" role="button" tabindex="0" aria-label="Seret topi ulang tahun ke kepala Naura">
+      <svg class="party-hat-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" width="100%">
+        <polygon points="50,0 15,100 85,100" fill="#E17B60"/>
+        <polygon points="50,0 15,100 85,100" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6,8"/>
+        <circle cx="50" cy="30" r="6" fill="#F2B84E"/>
+        <circle cx="35" cy="55" r="6" fill="#F2B84E"/>
+        <circle cx="65" cy="55" r="6" fill="#F2B84E"/>
+        <circle cx="50" cy="80" r="6" fill="#F2B84E"/>
+        <circle cx="50" cy="-6" r="12" fill="#D8B48C"/>
+        <ellipse cx="50" cy="102" rx="38" ry="7" fill="#F0AD94"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="wish-wrap" id="wish-wrap">
+    <p class="wish-label">🌟 Sebelum bener-bener kelar, coba tulis dulu — apa harapan kamu buat tahun ini?</p>
+    <textarea class="wish-textarea" id="wish-input" rows="3" maxlength="300" placeholder="Tulis harapan kamu di sini..."></textarea>
+    <button class="btn" id="btn-wish-send">Kirim Harapan ✨</button>
+    <p class="wish-reply" id="wish-reply"></p>
   </div>
 
   <button class="btn secondary" id="btn-replay">🔁 Ulangi dari Awal</button>
@@ -810,12 +997,14 @@
   /* ================= CONFIG — gampang diubah ================= */
   const CONFIG = {
     targetDate: "2026-08-13T00:00:00+07:00", // ulang tahun Naura, WIB
+    birthDate: "2012-08-13T00:00:00+07:00", // tanggal lahir Naura, buat hitung hari/minggu/bulan
     friendName: "Naura",
     newAge: 14,
     signOffName: "Ka Manul" // ganti dengan nama kamu kalau mau
   };
 
   const TARGET = new Date(CONFIG.targetDate);
+  const BIRTH = new Date(CONFIG.birthDate);
   let testMode = false;
 
   const screens = {
@@ -875,14 +1064,14 @@
       });
       revealBtn.disabled = false;
       revealBtn.classList.add('ready');
-      revealBtn.textContent = '🎁 Buka Sekarang!';
-      lockNote.textContent = 'Yeay, waktunya udah sampai! Pencet tombol di atas ya~';
+      revealBtn.textContent = '🔓 Buka Sekarang';
+      lockNote.textContent = 'Waktunya udah sampai. Pencet tombol di atas ya~';
     } else {
       startCountdownTimer();
       revealBtn.disabled = true;
       revealBtn.classList.remove('ready');
-      revealBtn.textContent = '🔒 Tunggu Hitung Mundur Sampai 0';
-      lockNote.textContent = 'Tombolnya bakal aktif otomatis begitu tanggal 13 Agustus jam 00.00 tiba.';
+      revealBtn.textContent = '🔒 Belum Bisa Diakses';
+      lockNote.textContent = 'Tombolnya bakal aktif otomatis begitu waktunya tiba.';
     }
   }
 
@@ -999,6 +1188,101 @@
     }
   }
 
+  /* ================= GAME: SERET TOPI KE KEPALA ================= */
+  const hatEl = document.getElementById('party-hat-drag');
+  const hatTargetEl = document.getElementById('hat-target');
+  const hatHintEl = document.getElementById('hat-hint');
+  let hatPlaced = false;
+  let hatDragging = false;
+  let hatTx = 0, hatTy = 0; // total translate yang udah "nempel" di topi
+  let hatPointerStartX = 0, hatPointerStartY = 0;
+  const HAT_SNAP_DIST = 100; // px, seberapa deket biar dianggap "pas" (dilonggarin biar gak perlu presisi banget)
+
+  function hatCenter(el){
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2 };
+  }
+
+  function celebrateHat(){
+    hatHintEl.textContent = '🎉 Yeay, pas banget! Selamat ulang tahun, Naura!';
+    hatHintEl.classList.add('done');
+    burstConfetti(90);
+    for(let i=0;i<5;i++){
+      setTimeout(()=>{
+        spawnFirework(20 + Math.random()*60, 15 + Math.random()*35);
+      }, i*220);
+    }
+  }
+
+  function placeHatAtTarget(){
+    const hc = hatCenter(hatEl);
+    const tc = hatCenter(hatTargetEl);
+    hatTx += (tc.x - hc.x);
+    hatTy += (tc.y - hc.y);
+    hatEl.style.transform = `translate(${hatTx}px, ${hatTy}px)`;
+    hatPlaced = true;
+    hatEl.classList.add('placed');
+    hatTargetEl.classList.add('filled');
+    celebrateHat();
+  }
+
+  function hatPointerDown(e){
+    if(hatPlaced) return;
+    hatDragging = true;
+    hatEl.classList.add('dragging');
+    hatPointerStartX = e.clientX;
+    hatPointerStartY = e.clientY;
+    try{ hatEl.setPointerCapture(e.pointerId); }catch(err){}
+    e.preventDefault();
+  }
+  function hatPointerMove(e){
+    if(!hatDragging) return;
+    const dx = e.clientX - hatPointerStartX;
+    const dy = e.clientY - hatPointerStartY;
+    hatEl.style.transform = `translate(${hatTx+dx}px, ${hatTy+dy}px)`;
+  }
+  function hatPointerUp(e){
+    if(!hatDragging) return;
+    hatDragging = false;
+    hatEl.classList.remove('dragging');
+    const dx = e.clientX - hatPointerStartX;
+    const dy = e.clientY - hatPointerStartY;
+    hatTx += dx;
+    hatTy += dy;
+
+    const hc = hatCenter(hatEl);
+    const tc = hatCenter(hatTargetEl);
+    const dist = Math.hypot(hc.x - tc.x, hc.y - tc.y);
+
+    if(dist < HAT_SNAP_DIST){
+      placeHatAtTarget();
+    } else {
+      hatTx = 0; hatTy = 0;
+      hatEl.style.transform = 'translate(0,0)';
+    }
+  }
+  hatEl.addEventListener('pointerdown', hatPointerDown);
+  hatEl.addEventListener('pointermove', hatPointerMove);
+  hatEl.addEventListener('pointerup', hatPointerUp);
+  hatEl.addEventListener('pointercancel', hatPointerUp);
+  hatEl.addEventListener('keydown', function(e){
+    if((e.key === 'Enter' || e.key === ' ') && !hatPlaced){
+      e.preventDefault();
+      placeHatAtTarget();
+    }
+  });
+
+  function resetHatGame(){
+    hatPlaced = false;
+    hatDragging = false;
+    hatTx = 0; hatTy = 0;
+    hatEl.classList.remove('placed','dragging');
+    hatEl.style.transform = 'translate(0,0)';
+    hatTargetEl.classList.remove('filled');
+    hatHintEl.classList.remove('done');
+    hatHintEl.textContent = '🎉 Seret topinya ke atas kepala Naura!';
+  }
+
   /* ================= GIFT BOX -> GAME ================= */
   const giftBox = document.getElementById('gift-box');
   function openGift(){
@@ -1093,7 +1377,43 @@
 
   document.getElementById('btn-to-calendar').addEventListener('click', function(){
     showScreen('calendar');
+    renderElapsedStats();
   });
+
+  /* ================= ELAPSED TIME (hari/minggu/bulan sejak lahir) ================= */
+  function animateCountUp(el, target, duration){
+    const startTime = performance.now();
+    function tick(nowMs){
+      const progress = Math.min((nowMs - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out, biar berasa "berhenti pelan-pelan"
+      const value = Math.round(target * eased);
+      el.textContent = value.toLocaleString('id-ID');
+      if(progress < 1){
+        requestAnimationFrame(tick);
+      } else {
+        el.textContent = target.toLocaleString('id-ID');
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function renderElapsedStats(){
+    const now = testMode ? TARGET : new Date();
+    const refNow = now < BIRTH ? BIRTH : now;
+    const msPerHour = 60*60*1000;
+    const msPerDay = 24*msPerHour;
+    const hours = Math.floor((refNow - BIRTH) / msPerHour);
+    const days = Math.floor((refNow - BIRTH) / msPerDay);
+    const weeks = Math.floor(days / 7);
+    let months = (refNow.getFullYear() - BIRTH.getFullYear()) * 12 + (refNow.getMonth() - BIRTH.getMonth());
+    if(refNow.getDate() < BIRTH.getDate()) months--;
+    if(months < 0) months = 0;
+    animateCountUp(document.getElementById('el-hours'), hours, 3600);
+    animateCountUp(document.getElementById('el-days'), days, 3200);
+    animateCountUp(document.getElementById('el-weeks'), weeks, 2600);
+    animateCountUp(document.getElementById('el-months'), months, 2000);
+  }
+  renderElapsedStats();
 
   /* ================= CALENDAR ================= */
   function buildCalendar(){
@@ -1125,7 +1445,26 @@
 
   document.getElementById('btn-to-roadmap').addEventListener('click', function(){
     showScreen('roadmap');
+    playRoadmapAnimation();
   });
+
+  /* ================= ROADMAP: ANIMASI JALAN BERURUTAN ================= */
+  const roadmapItems = document.querySelectorAll('#screen-roadmap .roadmap-item');
+  let roadmapTimers = [];
+  function playRoadmapAnimation(){
+    roadmapTimers.forEach(t => clearTimeout(t));
+    roadmapTimers = [];
+    roadmapItems.forEach(item => item.classList.remove('revealed','line-grown'));
+    const stepDelay = 600;
+    roadmapItems.forEach((item, idx)=>{
+      roadmapTimers.push(setTimeout(()=>{
+        item.classList.add('revealed');
+      }, idx*stepDelay));
+      roadmapTimers.push(setTimeout(()=>{
+        item.classList.add('line-grown');
+      }, idx*stepDelay + 350));
+    });
+  }
 
   document.getElementById('btn-to-cake').addEventListener('click', function(){
     showScreen('cake');
@@ -1251,11 +1590,92 @@
     relightBtn.style.display = 'none';
     cakeBites = 0;
     renderCakeBites();
+    roadmapTimers.forEach(t => clearTimeout(t));
+    roadmapTimers = [];
+    roadmapItems.forEach(item => item.classList.remove('revealed','line-grown'));
+    resetHatGame();
+    wishInput.value = '';
+    wishReply.classList.remove('show');
+    wishReply.textContent = '';
     gameStarted = false;
     revealBtn.disabled = false;
     showScreen('countdown');
     refreshLockState();
   });
+
+  /* ================= HARAPAN / WISH INPUT ================= */
+  /*
+    CARA BIAR HARAPAN NAURA KESIMPEN DAN BISA KAMU CEK MANUAL NANTI:
+    (pakai Google Form sebagai "penyimpanan" gratis, gak butuh server sendiri)
+
+    1. Buka forms.google.com, buat form baru dengan 1 pertanyaan
+       (tipe "Paragraf" / "Jawaban singkat"), misal judulnya "Harapan Naura".
+    2. Klik titik tiga kanan atas > "Get pre-filled link".
+    3. Isi jawaban contoh apa aja di pertanyaan itu, klik "Get link".
+    4. Dari link yang muncul, cari bagian "entry.XXXXXXXXX=" — itu ID pertanyaannya.
+       Contoh link: https://docs.google.com/forms/d/e/ABCDEF.../viewform?entry.123456789=contoh
+       Berarti FORM_ID kamu = "ABCDEF..." dan ENTRY_ID = "entry.123456789"
+    5. Isi 2 variabel di bawah ini pakai punya kamu:
+       - WISH_FORM_ACTION: ganti ABCDEF... nya jadi FORM_ID kamu, biarin "/formResponse" di belakangnya
+       - WISH_ENTRY_ID: ganti sesuai ENTRY_ID yang kamu dapet di langkah 4
+    6. Jawaban Naura otomatis masuk ke tab "Responses" di Google Form kamu / Google Sheet
+       yang kamu link-in ke form itu. Cek di situ kapan aja.
+
+    Kalau kamu gak isi ini (dibiarin kosong), fiturnya tetep jalan normal
+    (tetep muncul kata semangat), cuma harapannya gak kesimpen ke mana-mana.
+  */
+  const WISH_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdF2uIX836R7KH3GHwulsYnZa372KxCbqMQZygNWS12bUXZfg/formResponse';
+  const WISH_ENTRY_ID = 'entry.231706474';
+
+  function saveWishToForm(text){
+    if(!WISH_FORM_ACTION || !WISH_ENTRY_ID) return; // belum di-setting, skip diem-diem
+    const body = new URLSearchParams();
+    body.append(WISH_ENTRY_ID, text);
+    fetch(WISH_FORM_ACTION, {
+      method: 'POST',
+      mode: 'no-cors', // Google Form gak ngasih izin CORS, ini normal & aman
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    }).catch(()=>{ /* diemin kalau gagal (misal lagi offline), gak ganggu pengalaman Naura */ });
+  }
+
+  const wishInput = document.getElementById('wish-input');
+  const wishBtn = document.getElementById('btn-wish-send');
+  const wishReply = document.getElementById('wish-reply');
+  const wishMessages = [
+    'Semangat terus buat wujudinnya ya, pelan-pelan juga gapapa yang penting jalan terus! 💪',
+    'Aamiin! Semoga semua yang kamu tulis tadi beneran kejadian di tahun ini 🌸',
+    'Wah keren, semoga tahun ini jadi tahun penuh progress buat kamu ✨',
+    'Yakin aja sama diri sendiri, kamu pasti bisa kok ngewujudinnya!',
+    'Simpen baik-baik harapan itu, semoga langkah kamu menuju ke sana selalu dimudahin 🌱',
+    'Semoga Allah/semesta bantu wujudin harapan kamu itu, tetep semangat ya Naura!',
+    'Percaya deh, usaha kamu gak akan sia-sia. Semangat kejar itu semua! 🔥'
+  ];
+  function sendWish(){
+    const val = wishInput.value.trim();
+    if(!val){
+      wishReply.textContent = 'Eh, tulis dulu harapannya yaa~ 😊';
+      wishReply.classList.add('show');
+      wishInput.focus();
+      return;
+    }
+    saveWishToForm(val);
+    const msg = wishMessages[Math.floor(Math.random()*wishMessages.length)];
+    wishReply.classList.remove('show');
+    // reflow biar animasinya keulang tiap kirim
+    void wishReply.offsetWidth;
+    wishReply.textContent = msg;
+    wishReply.classList.add('show');
+    burstConfetti(20);
+  }
+  wishBtn.addEventListener('click', sendWish);
+  wishInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
+      e.preventDefault();
+      sendWish();
+    }
+  });
+
 
   /* ================= MUSIK (isi file kamu sendiri) ================= */
   const bgMusic = document.getElementById('bg-music');
