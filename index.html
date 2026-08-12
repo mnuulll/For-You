@@ -1196,7 +1196,7 @@
   let hatDragging = false;
   let hatTx = 0, hatTy = 0; // total translate yang udah "nempel" di topi
   let hatPointerStartX = 0, hatPointerStartY = 0;
-  const HAT_SNAP_DIST = 100; // px, seberapa deket biar dianggap "pas" (dilonggarin biar gak perlu presisi banget)
+  const HAT_SNAP_DIST = 10000; // px, seberapa deket biar dianggap "pas" (dilonggarin biar gak perlu presisi banget)
 
   function hatCenter(el){
     const r = el.getBoundingClientRect();
