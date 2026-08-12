@@ -995,22 +995,6 @@
     font-size:.95rem;
   }
 
-  /* dev/test toggle */
-  .test-toggle{
-    position:fixed;
-    bottom:20px;
-    left:20px;
-    z-index:50;
-    background:rgba(255,255,255,.85);
-    border-radius:20px;
-    padding:8px 14px;
-    font-size:.75rem;
-    color:var(--lavender-deep);
-    font-weight:700;
-    box-shadow:var(--shadow);
-    border:1px solid var(--pink-soft);
-  }
-
   /* confetti */
   .confetti-piece{
     position:fixed;
@@ -1210,7 +1194,7 @@
     <p class="type-line" data-full="Met ulang tahun ya Naura! 🎉 Sekarang naura udah resmi &lt;strong&gt;14 tahun&lt;/strong&gt;, makin gede, makin keren, dan makin tinggi."></p>
     <p class="type-line" data-full="Semoga tahun ini dan tahun depan banyak hal baik yang dateng ke naura, seperti kaka. Canda :). tetaplah menjadi orang yang baik dan jaga diri kamu untuk masa depan."></p>
     <p class="type-line" data-full="Tetaplah menjadi pribadi yang baik, yang selalu menghibur orang disekitarmu. Jangan putus asa walaupun kenyataannya berbeda dengan apa yang naura pikirkan."></p>
-    <p class="type-line" data-full="Please always take good care of yourself and keep that beautiful smile glowing."></p>
+    <p class="type-line" data-full="Please always take good care of yourself and keep that beautiful smile glowing. YOU ARE GORGEOUS"></p>
     <p class="type-line" data-full="Sekali lagi, selamat ulang tahun Naura! Semoga hari-harimu seseru dan semenyenangkan yang naura bayangin. oh iya satu lagi, kalau muncak jangan lupa izin ke orang tua:^"></p>
     <div class="signoff" id="cake-signoff" style="opacity:0;">— dari ka manul</div>
   </div>
@@ -1273,7 +1257,6 @@
   Musiknya bakal otomatis nyala begitu tombol "Buka Sekarang!" dipencet (gak perlu tombol musik terpisah).
 -->
 <audio id="bg-music" src="musik.mp3" loop preload="none"></audio>
-<button class="test-toggle" id="test-toggle">🔧 Mode Tes: Lihat Preview</button>
 
 <script>
 (function(){
@@ -1445,16 +1428,6 @@
       setTimeout(()=>p.remove(), 1400);
     }
   }
-
-  /* ================= TEST MODE TOGGLE ================= */
-  const testBtn = document.getElementById('test-toggle');
-  testBtn.addEventListener('click', function(){
-    testMode = !testMode;
-    testBtn.textContent = testMode ? '🔧 Mode Tes: AKTIF' : '🔧 Mode Tes: Lihat Preview';
-    revealBtn.disabled = false; // reset in case it was clicked/locked before
-    showScreen('countdown');
-    refreshLockState();
-  });
 
   /* ================= CONFETTI ================= */
   function burstConfetti(count){
@@ -1673,6 +1646,7 @@
   const runawayTaunts = [
     'Yah, meleset~ 😝',
     'Hehe, kurang cepet!',
+    'Gimana nih Naura?',
     'Eh gagal lagi, coba lagi~',
     'Deket, tapi belum kena!',
     'Wkwk lucu banget usahanya',
@@ -2136,11 +2110,11 @@
   const wishReply = document.getElementById('wish-reply');
   const wishMessages = [
     'Semangat terus buat wujudinnya ya, pelan-pelan juga gapapa yang penting jalan terus! 💪',
-    'Aamiin! Semoga semua yang kamu tulis tadi beneran kejadian di tahun ini 🌸',
-    'Wah keren, semoga tahun ini jadi tahun penuh progress buat kamu ✨',
-    'Yakin aja sama diri sendiri, kamu pasti bisa kok ngewujudinnya!',
+    'Aamiin! Semoga semua yang naura tulis tadi beneran kejadian di masa depan 🌸',
+    'Wah keren, semoga tahun ini jadi tahun penuh progress buat naura ✨',
+    'Yakin aja sama diri sendiri, naura pasti bisa kok ngewujudinnya!',
     'Simpen baik-baik harapan itu, semoga langkah kamu menuju ke sana selalu dimudahin 🌱',
-    'Semoga Allah/semesta bantu wujudin harapan kamu itu, tetep semangat ya Naura!',
+    'Semoga Allah/semesta bantu wujudin harapan naura itu, tetep semangat ya Naura!',
     'Percaya deh, usaha kamu gak akan sia-sia. Semangat kejar itu semua! 🔥'
   ];
   function sendWish(){
