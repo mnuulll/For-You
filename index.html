@@ -663,7 +663,17 @@
     font-size:1.02rem;
   }
   .cake-msg.show{ display:block; animation: fadeIn .8s ease; }
-  .cake-msg .signoff{ margin-top:14px; font-family:'Fredoka',sans-serif; font-weight:600; color:var(--pink-deep); text-align:right;}
+  .cake-msg .signoff{ margin-top:14px; font-family:'Fredoka',sans-serif; font-weight:600; color:var(--pink-deep); text-align:right; transition:opacity .6s ease;}
+  .cake-msg .type-line{ margin:0 0 14px; min-height:1.3em; }
+  .cake-msg .type-line:last-of-type{ margin-bottom:0; }
+  .cake-msg .type-line.typing::after{
+    content:'|';
+    display:inline-block;
+    margin-left:2px;
+    color:var(--pink-deep);
+    animation: caretBlink .8s steps(1) infinite;
+  }
+  @keyframes caretBlink{ 50%{ opacity:0; } }
 
   /* ---------- FOOTER / ENDING ---------- */
   #screen-end h2{ color:var(--lavender-deep); margin-bottom:10px; }
@@ -967,10 +977,10 @@
   </div>
 
   <div class="cake-msg" id="cake-msg">
-    <p>Naura, met ulang tahun ya! 🎉 Sekarang naura udah resmi <strong>14 tahun</strong>, makin gede, makin keren, dan semoga makin jago di segala hal yang kamu suka.</p>
-    <p>Semoga tahun ini banyak hal baik yang dateng ke kamu, cita-cita kamu pelan-pelan kewujud, sehat terus, dan tetep jadi orang yang seru & baik kayak sekarang. Makasih juga udah jadi teman yang asik selama ini.</p>
-    <p>Sekali lagi, selamat ulang tahun, Naura! Semoga harimu semenyenangkan yang kamu bayangin 🎈🎂</p>
-    <div class="signoff">— dari ka manul</div>
+    <p class="type-line" data-full="Naura, met ulang tahun ya! 🎉 Sekarang naura udah resmi &lt;strong&gt;14 tahun&lt;/strong&gt;, makin gede, makin keren, dan semoga makin jago di segala hal yang kamu suka."></p>
+    <p class="type-line" data-full="Semoga tahun ini banyak hal baik yang dateng ke kamu, cita-cita kamu pelan-pelan kewujud, sehat terus, dan tetep jadi orang yang seru &amp; baik kayak sekarang. Makasih juga udah jadi teman yang asik selama ini."></p>
+    <p class="type-line" data-full="Sekali lagi, selamat ulang tahun, Naura! Semoga harimu semenyenangkan yang kamu bayangin 🎈🎂"></p>
+    <div class="signoff" id="cake-signoff" style="opacity:0;">— dari ka manul</div>
   </div>
 
   <button class="btn secondary" id="btn-to-end" style="margin-top:26px; display:none;">Lanjut ↓</button>
@@ -1245,12 +1255,26 @@
   let hatPlaced = false;
   let hatDragging = false;
   let hatTx = 0, hatTy = 0; // total translate yang udah "nempel" di topi
-  let hatPointerStartX = 0, hatPointerStartY = 0;
-  const HAT_SNAP_DIST = 100; // px, seberapa deket biar dianggap "pas" (dilonggarin biar gak perlu presisi banget)
+  let hatStartX = 0, hatStartY = 0;
+  // seberapa banyak toleransi jarak (px) di LUAR area target yang masih dianggap "pas".
+  // makin gede angkanya, makin gampang/longgar.
+  const HAT_SNAP_PAD = 40;
 
-  function hatCenter(el){
-    const r = el.getBoundingClientRect();
-    return { x: r.left + r.width/2, y: r.top + r.height/2 };
+  function getPointXY(e){
+    // ambil koordinat dari touch event ATAU mouse/pointer event, biar semua jenis device kepegang
+    if(e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    if(e.changedTouches && e.changedTouches.length) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function rectsClose(r1, r2, pad){
+    // true kalau kotak topi & kotak target "beririsan" (dengan toleransi pad px di sekelilingnya)
+    return !(
+      r1.right + pad < r2.left ||
+      r1.left - pad > r2.right ||
+      r1.bottom + pad < r2.top ||
+      r1.top - pad > r2.bottom
+    );
   }
 
   function celebrateHat(){
@@ -1262,6 +1286,11 @@
         spawnFirework(20 + Math.random()*60, 15 + Math.random()*35);
       }, i*220);
     }
+  }
+
+  function hatCenter(el){
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2 };
   }
 
   function placeHatAtTarget(){
@@ -1276,45 +1305,62 @@
     celebrateHat();
   }
 
-  function hatPointerDown(e){
+  function hatDragStart(e){
     if(hatPlaced) return;
     hatDragging = true;
     hatEl.classList.add('dragging');
-    hatPointerStartX = e.clientX;
-    hatPointerStartY = e.clientY;
-    try{ hatEl.setPointerCapture(e.pointerId); }catch(err){}
+    const p = getPointXY(e);
+    hatStartX = p.x;
+    hatStartY = p.y;
+    if(e.pointerId !== undefined){
+      try{ hatEl.setPointerCapture(e.pointerId); }catch(err){}
+    }
     e.preventDefault();
   }
-  function hatPointerMove(e){
+  function hatDragMove(e){
     if(!hatDragging) return;
-    const dx = e.clientX - hatPointerStartX;
-    const dy = e.clientY - hatPointerStartY;
+    const p = getPointXY(e);
+    const dx = p.x - hatStartX;
+    const dy = p.y - hatStartY;
     hatEl.style.transform = `translate(${hatTx+dx}px, ${hatTy+dy}px)`;
+    e.preventDefault();
   }
-  function hatPointerUp(e){
+  function hatDragEnd(e){
     if(!hatDragging) return;
     hatDragging = false;
     hatEl.classList.remove('dragging');
-    const dx = e.clientX - hatPointerStartX;
-    const dy = e.clientY - hatPointerStartY;
+    const p = getPointXY(e);
+    const dx = p.x - hatStartX;
+    const dy = p.y - hatStartY;
     hatTx += dx;
     hatTy += dy;
+    hatEl.style.transform = `translate(${hatTx}px, ${hatTy}px)`;
 
-    const hc = hatCenter(hatEl);
-    const tc = hatCenter(hatTargetEl);
-    const dist = Math.hypot(hc.x - tc.x, hc.y - tc.y);
+    // cek "beririsan" antara kotak topi & kotak target, bukan cuma titik tengah -> lebih gampang kena
+    const hatRect = hatEl.getBoundingClientRect();
+    const targetRect = hatTargetEl.getBoundingClientRect();
 
-    if(dist < HAT_SNAP_DIST){
+    if(rectsClose(hatRect, targetRect, HAT_SNAP_PAD)){
       placeHatAtTarget();
     } else {
       hatTx = 0; hatTy = 0;
       hatEl.style.transform = 'translate(0,0)';
     }
   }
-  hatEl.addEventListener('pointerdown', hatPointerDown);
-  window.addEventListener('pointermove', hatPointerMove);
-  window.addEventListener('pointerup', hatPointerUp);
-  window.addEventListener('pointercancel', hatPointerUp);
+
+  hatEl.addEventListener('pointerdown', hatDragStart);
+  window.addEventListener('pointermove', hatDragMove);
+  window.addEventListener('pointerup', hatDragEnd);
+  window.addEventListener('pointercancel', hatDragEnd);
+  // fallback buat browser/webview yang Pointer Event-nya rewel (misal in-app browser WA/IG)
+  hatEl.addEventListener('touchstart', hatDragStart, { passive:false });
+  window.addEventListener('touchmove', hatDragMove, { passive:false });
+  window.addEventListener('touchend', hatDragEnd);
+  window.addEventListener('touchcancel', hatDragEnd);
+  hatEl.addEventListener('mousedown', hatDragStart);
+  window.addEventListener('mousemove', hatDragMove);
+  window.addEventListener('mouseup', hatDragEnd);
+
   hatEl.addEventListener('keydown', function(e){
     if((e.key === 'Enter' || e.key === ' ') && !hatPlaced){
       e.preventDefault();
@@ -1521,7 +1567,7 @@
   });
 
   /* ================= GAME NGESELIN: TANGKAP TOMBOL ================= */
-  const RUNAWAY_DODGES_NEEDED = 6;
+  const RUNAWAY_DODGES_NEEDED = 10;
   let runawayDodges = 0;
   let runawayCaught = false;
   const runawayArea = document.getElementById('runaway-area');
@@ -1698,9 +1744,64 @@
     relightBtn.style.display = 'none';
   });
 
-  /* ================= ENVELOPE / SURAT ================= */
+  /* ================= ENVELOPE / SURAT (efek ngetik) ================= */
   const envelopeEl = document.getElementById('envelope-el');
   let envelopeOpened = false;
+
+  function typeIntoElement(el, html, speed, onDone){
+    el.innerHTML = '';
+    el.classList.add('typing');
+    let i = 0;
+    function step(){
+      if(i >= html.length){
+        el.classList.remove('typing');
+        if(onDone) onDone();
+        return;
+      }
+      if(html[i] === '<'){
+        // kalau ketemu tag (misal <strong>), langsung tempel utuh, gak diketik per-huruf
+        const close = html.indexOf('>', i);
+        if(close !== -1){
+          el.innerHTML += html.slice(i, close + 1);
+          i = close + 1;
+          step();
+          return;
+        }
+      }
+      el.innerHTML += html[i];
+      i++;
+      setTimeout(step, speed);
+    }
+    step();
+  }
+
+  function typeCakeMessage(){
+    const lines = document.querySelectorAll('#cake-msg .type-line');
+    const signoff = document.getElementById('cake-signoff');
+    let idx = 0;
+    function next(){
+      if(idx >= lines.length){
+        signoff.style.opacity = '1';
+        document.getElementById('btn-to-end').style.display = 'inline-block';
+        return;
+      }
+      const el = lines[idx];
+      typeIntoElement(el, el.getAttribute('data-full'), 20, function(){
+        idx++;
+        setTimeout(next, 400); // jeda dikit sebelum lanjut paragraf berikutnya
+      });
+    }
+    next();
+  }
+
+  function resetCakeMessage(){
+    document.querySelectorAll('#cake-msg .type-line').forEach(el=>{
+      el.innerHTML = '';
+      el.classList.remove('typing');
+    });
+    document.getElementById('cake-signoff').style.opacity = '0';
+  }
+
   function openEnvelope(){
     if(envelopeOpened) return;
     envelopeOpened = true;
@@ -1709,7 +1810,7 @@
     setTimeout(()=>{
       document.getElementById('envelope-wrap').style.display = 'none';
       document.getElementById('cake-msg').classList.add('show');
-      document.getElementById('btn-to-end').style.display = 'inline-block';
+      typeCakeMessage();
     }, 650);
   }
   envelopeEl.addEventListener('click', openEnvelope);
@@ -1722,6 +1823,7 @@
   document.getElementById('btn-replay').addEventListener('click', function(){
     // reset cake screen state
     document.getElementById('cake-msg').classList.remove('show');
+    resetCakeMessage();
     document.getElementById('btn-to-end').style.display = 'none';
     document.getElementById('envelope-wrap').classList.remove('show');
     document.getElementById('envelope-wrap').style.display = '';
