@@ -435,6 +435,70 @@
     transition: opacity .4s ease, transform .4s ease;
   }
   .wish-reply.show{ opacity:1; transform:translateY(0); }
+
+  /* ---------- RATING WEB ---------- */
+  .rating-wrap{
+    margin-top:30px;
+    max-width:440px;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    background:var(--white);
+    border-radius:22px;
+    padding:22px 22px 24px;
+    box-shadow:var(--shadow);
+    border:2px dashed var(--pink-mid);
+  }
+  .rating-label{
+    font-size:.98rem;
+    margin-bottom:14px;
+    color:var(--text-dark);
+    text-align:center;
+  }
+  .rating-stars{ display:flex; gap:6px; margin-bottom:16px; }
+  .star-btn{
+    background:none;
+    border:none;
+    font-size:2.1rem;
+    line-height:1;
+    color:var(--pink-soft);
+    padding:2px;
+    transition: transform .18s cubic-bezier(.3,1.7,.4,1), color .15s ease;
+  }
+  .star-btn:hover{ transform:scale(1.15); }
+  .star-btn.active{ color:var(--gold); transform:scale(1.08); }
+  .star-btn.bounce{ animation: starBounce .4s ease; }
+  @keyframes starBounce{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(1.4) rotate(-8deg); }
+    100%{ transform:scale(1.08); }
+  }
+  .rating-textarea{
+    width:100%;
+    min-height:60px;
+    border-radius:16px;
+    border:2px solid var(--pink-soft);
+    padding:12px 14px;
+    font-family:'Quicksand', sans-serif;
+    font-size:.9rem;
+    color:var(--text-dark);
+    background:var(--cream);
+    resize:vertical;
+    margin-bottom:14px;
+  }
+  .rating-textarea:focus{ outline:none; border-color:var(--pink-deep); }
+  .rating-reply{
+    margin-top:14px;
+    font-size:.95rem;
+    font-weight:600;
+    color:var(--pink-deep);
+    max-width:400px;
+    opacity:0;
+    transform:translateY(8px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .rating-reply.show{ opacity:1; transform:translateY(0); }
   .elapsed-heart{
     font-size:.9rem;
     color:var(--text-dark);
@@ -553,12 +617,18 @@
 
   /* ---------- CAKE SCREEN ---------- */
   #screen-cake h2{ color:var(--pink-deep); font-size:clamp(1.5rem,5vw,2.2rem); margin-bottom:4px;}
-  .cake-wrap{ position:relative; margin: 26px 0 10px; }
-  .candles{ display:flex; justify-content:center; gap:14px; margin-bottom:-8px; position:relative; z-index:2;}
+  #screen-cake p.cake-sub{ max-width:420px; font-size:.98rem; margin:0 0 6px; color:var(--text-dark); opacity:.85; }
+  .cake-wrap{ position:relative; margin: 22px 0 6px; }
+  /* lilin nempel & nancep di permukaan frosting, bukan ngambang di atas kue */
+  .candles{
+    position:absolute; left:0; right:0; bottom:118px;
+    display:flex; justify-content:center; align-items:flex-end; gap:11px;
+    z-index:5; pointer-events:none;
+  }
   .candle{ display:flex; flex-direction:column; align-items:center; }
-  .flame-wrap{ position:relative; height:30px; display:flex; align-items:flex-end; justify-content:center; }
+  .flame-wrap{ position:relative; height:26px; display:flex; align-items:flex-end; justify-content:center; }
   .flame{
-    font-size:1.5rem;
+    font-size:1.35rem;
     animation: flicker 0.4s ease-in-out infinite alternate;
     transform-origin:bottom center;
     transition: opacity .25s ease, transform .25s ease;
@@ -570,8 +640,8 @@
   .flame.off{ animation:none; opacity:0; transform: scale(.3); }
   .smoke{
     position:absolute;
-    bottom:20px;
-    font-size:1.1rem;
+    bottom:18px;
+    font-size:1rem;
     opacity:0;
     pointer-events:none;
   }
@@ -580,26 +650,220 @@
     0%{ opacity:.85; transform: translateY(0) scale(.6); }
     100%{ opacity:0; transform: translateY(-34px) scale(1.3); }
   }
-  .stick{ width:6px; height:26px; background: linear-gradient(180deg,#fff,#FCE3D2); border-radius:2px; }
+  .stick{
+    width:6px; height:20px;
+    background: repeating-linear-gradient(180deg,#fff 0 4px,#F0AD94 4px 8px);
+    border-radius:2px 2px 0 0;
+    box-shadow: 1px 0 2px rgba(0,0,0,.1);
+    margin-bottom:-6px; /* biar ujung bawahnya "kebenem" ke dalem frosting */
+  }
+
+  /* ---------- CAKE VISUAL (dibangun dari CSS, warna & topping bisa diubah) ---------- */
   .cake-body{
-    font-size:7rem;
-    line-height:1;
+    position:relative;
+    width:230px;
+    height:168px;
+    margin:0 auto;
     cursor:pointer;
     user-select:none;
-    display:inline-block;
-    transition: transform .25s cubic-bezier(.2,1.2,.4,1), filter .25s ease;
+    display:block;
+    animation: cakeIdleFloat 3.4s ease-in-out infinite;
+    transition: filter .25s ease;
   }
-  .cake-body:hover{ transform:scale(1.04); }
+  .cake-body:hover .cake-sponge,
+  .cake-body:hover .cake-frosting{ filter:brightness(1.03); }
+  @keyframes cakeIdleFloat{
+    0%,100%{ transform: translateY(0) rotate(-.6deg); }
+    50%{ transform: translateY(-6px) rotate(.6deg); }
+  }
+  .cake-body.jiggle{ animation: cakeJiggle .5s ease; }
+  @keyframes cakeJiggle{
+    0%{ transform: scale(1,1); }
+    30%{ transform: scale(1.07,.92) rotate(-1.5deg); }
+    55%{ transform: scale(.95,1.06) rotate(1.5deg); }
+    80%{ transform: scale(1.03,.98); }
+    100%{ transform: scale(1,1); }
+  }
+  .cake-shadow{
+    position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
+    width:190px; height:20px; border-radius:50%;
+    background: radial-gradient(ellipse, rgba(90,64,56,.28) 0%, rgba(90,64,56,0) 72%);
+    z-index:0;
+  }
+  .cake-plate{
+    position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+    width:246px; height:18px; border-radius:50%;
+    background: linear-gradient(180deg,#FFFFFF,#FDEDF3);
+    box-shadow:0 3px 8px rgba(0,0,0,.14), inset 0 -3px 3px rgba(225,123,96,.12);
+    z-index:1;
+  }
+  .cake-sponge{
+    position:absolute; bottom:19px; left:50%; transform:translateX(-50%);
+    width:206px; height:72px; border-radius:14px;
+    background: linear-gradient(180deg,#E3AC72,#B97A44);
+    box-shadow: inset 0 -10px 14px rgba(0,0,0,.16), inset 0 4px 4px rgba(255,255,255,.15);
+    z-index:1;
+  }
+  .cake-sponge::after{
+    /* garis lapisan tengah biar keliatan berlapis, bukan blok polos */
+    content:'';
+    position:absolute; left:6px; right:6px; top:50%; height:6px;
+    transform:translateY(-50%);
+    background: rgba(255,255,255,.22);
+    border-radius:4px;
+  }
+  .cake-frosting{
+    position:absolute; bottom:82px; left:50%; transform:translateX(-50%);
+    width:216px; height:48px;
+    background:
+      radial-gradient(ellipse 70px 20px at 30% 20%, rgba(255,255,255,.5), transparent 70%),
+      var(--frosting-color, #F7C9DE);
+    border-radius: 18px 18px 46% 46% / 20px 20px 62% 62%;
+    box-shadow: inset 0 -9px 10px rgba(0,0,0,.07), inset 0 3px 4px rgba(255,255,255,.35);
+    transition: background-color .35s ease;
+    z-index:2;
+  }
+  .cake-frosting::before{
+    /* efek swirl krim di permukaan, biar gak flat kaku */
+    content:'';
+    position:absolute; inset:4px 8px auto 8px; height:16px;
+    background-image: radial-gradient(circle at 15% 40%, rgba(255,255,255,.55) 0 5px, transparent 6px),
+                       radial-gradient(circle at 45% 55%, rgba(255,255,255,.4) 0 4px, transparent 5px),
+                       radial-gradient(circle at 75% 35%, rgba(255,255,255,.5) 0 5px, transparent 6px);
+    opacity:.8;
+  }
+  .cake-frosting::after{
+    content:'';
+    position:absolute; left:3px; right:3px; bottom:-12px; height:24px;
+    background: radial-gradient(circle at 12px 0, var(--frosting-color, #F7C9DE) 10px, transparent 11px);
+    background-size:24px 24px;
+    background-repeat:repeat-x;
+    filter: drop-shadow(0 2px 1px rgba(0,0,0,.05));
+    transition: background-color .35s ease;
+  }
+  .cake-toppings-layer{
+    position:absolute; bottom:96px; left:10px; right:10px; height:56px;
+    z-index:4; pointer-events:none;
+  }
+  .cake-topping-piece{
+    position:absolute;
+    bottom:0;
+    font-size:1.35rem;
+    line-height:1;
+    transform-origin:bottom center;
+    animation: toppingPop .5s cubic-bezier(.24,1.6,.4,1) both;
+    filter: drop-shadow(0 3px 2px rgba(0,0,0,.15));
+  }
+  @keyframes toppingPop{
+    0%{ transform: translateY(10px) scale(0) rotate(0deg); opacity:0; }
+    65%{ transform: translateY(-3px) scale(1.18) rotate(var(--tp-rot,0deg)); opacity:1; }
+    100%{ transform: translateY(0) scale(1) rotate(var(--tp-rot,0deg)); opacity:1; }
+  }
+
   .cake-counter{
     font-size:.85rem;
     color:var(--lavender-deep);
     font-weight:600;
-    margin:2px 0 0;
+    margin:14px 0 0;
     max-width:320px;
   }
   .cake-counter.full{ color:var(--pink-deep); }
   .blow-btn{ margin-top:8px; }
   .relight-btn{ margin-top:14px; font-size:.85rem; }
+
+  /* ---------- DECORATE PANEL (game hias kue sebelum tiup lilin) ---------- */
+  .decorate-panel{
+    margin-top:22px;
+    max-width:360px;
+    background:var(--white);
+    border-radius:24px;
+    padding:22px 20px 24px;
+    box-shadow:var(--shadow);
+    border:2px dashed var(--pink-mid);
+    animation: fadeIn .5s ease;
+  }
+  .decorate-label{
+    font-size:.85rem;
+    font-weight:700;
+    color:var(--lavender-deep);
+    margin:0 0 10px;
+    text-align:left;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .shuffle-btn{
+    background:none;
+    border:none;
+    color:var(--pink-deep);
+    font-size:.78rem;
+    font-weight:700;
+    text-decoration:underline;
+    text-underline-offset:2px;
+    padding:2px 4px;
+    cursor:pointer;
+  }
+  .shuffle-btn:hover{ color:var(--lavender-deep); }
+  .color-swatches{ display:flex; gap:10px; justify-content:center; margin-bottom:18px; flex-wrap:wrap; }
+  .swatch{
+    position:relative;
+    width:38px; height:38px; border-radius:50%;
+    border:3px solid var(--white);
+    box-shadow:0 0 0 2px var(--pink-soft), 0 3px 6px rgba(0,0,0,.08);
+    transition: transform .22s cubic-bezier(.3,1.6,.4,1), box-shadow .18s ease;
+    padding:0;
+  }
+  .swatch:hover{ transform:scale(1.15) rotate(-4deg); }
+  .swatch.active{ box-shadow:0 0 0 3px var(--pink-deep), 0 3px 8px rgba(225,123,96,.35); transform:scale(1.18); }
+  .swatch.active::after{
+    content:'✓';
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--choco);
+    font-size:.85rem;
+    font-weight:700;
+    text-shadow:0 1px 2px rgba(255,255,255,.8);
+  }
+  .topping-buttons{ display:flex; gap:8px; justify-content:center; margin-bottom:6px; flex-wrap:wrap; }
+  .topping-btn{
+    background:var(--cream);
+    border:2px solid var(--pink-soft);
+    border-radius:16px;
+    padding:9px 12px;
+    font-size:1.3rem;
+    line-height:1;
+    transition: transform .16s cubic-bezier(.3,1.7,.4,1), background .15s ease, box-shadow .15s ease;
+  }
+  .topping-btn:hover{ transform:translateY(-3px) scale(1.06); background:var(--pink-soft); box-shadow:0 6px 10px rgba(225,123,96,.2); }
+  .topping-btn:active{ transform:translateY(0) scale(.94); }
+  .topping-btn.pulse{ animation: toppingBtnPulse .35s ease; }
+  @keyframes toppingBtnPulse{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(.86); }
+    100%{ transform:scale(1); }
+  }
+  .topping-count{
+    font-size:.78rem;
+    color:var(--lavender-deep);
+    opacity:.8;
+    margin:0 0 16px;
+  }
+  .decorate-actions{ display:flex; flex-direction:column; gap:10px; align-items:center; margin-top:4px; }
+  .decorate-actions .btn{ width:100%; }
+  #btn-topping-undo{ font-size:.85rem; padding:10px 22px; }
+
+  /* partikel kecil pas nambah topping / ganti warna */
+  .cake-sparkle{
+    position:fixed;
+    font-size:1rem;
+    pointer-events:none;
+    z-index:60;
+    animation: sparkleFloat .7s ease-out forwards;
+  }
+  @keyframes sparkleFloat{
+    0%{ transform: translateY(0) scale(.6) rotate(0deg); opacity:1; }
+    100%{ transform: translateY(-38px) scale(1.1) rotate(50deg); opacity:0; }
+  }
 
   /* ---------- ENVELOPE ---------- */
   .envelope-wrap{
@@ -679,42 +943,25 @@
   #screen-end h2{ color:var(--lavender-deep); margin-bottom:10px; }
   #screen-end p{ max-width:400px; margin-bottom:24px; }
 
-  /* ---------- PHOTO + PARTY HAT DRAG GAME ----------
-     Cara nyesuaiin posisi target topi (garis putus-putus) biar pas di kepala:
-     ubah 3 variabel di CSS class .hat-game-wrap di bawah ini (nilainya % dari lebar/tinggi foto):
-     --hat-left  : geser kiri-kanan
-     --hat-top   : geser atas-bawah
-     --hat-rotate: miringin topinya
-  */
-  .hat-game-wrap{
-    --hat-left: 50%;
-    --hat-top: -6%;
-    --hat-rotate: -12deg;
-    --hat-scale: 1;
+  /* ---------- FOTO NAURA ---------- */
+  .photo-wrap{
     position:relative;
-    width:min(80vw, 300px);
-    margin: 8px auto 10px;
+    width:min(78vw, 280px);
+    margin: 8px auto 26px;
   }
-  .hat-hint{
-    font-size:.85rem;
-    color:var(--lavender-deep);
-    font-weight:700;
-    margin-bottom:12px;
-    transition: color .3s ease;
-  }
-  .hat-hint.done{ color:var(--pink-deep); }
   .photo-frame{
     position:relative;
     width:100%;
     aspect-ratio: 4/5;
-    margin: 0 auto 26px;
     background: var(--white);
     border-radius:18px;
     padding:14px 14px 34px;
     box-shadow: var(--shadow);
     border:2px solid var(--pink-soft);
     transform: rotate(-2deg);
+    transition: transform .3s ease;
   }
+  .photo-frame:hover{ transform: rotate(0deg) scale(1.02); }
   .photo-frame img{
     width:100%;
     height:100%;
@@ -747,49 +994,7 @@
     color:var(--pink-deep);
     font-size:.95rem;
   }
-  .hat-target{
-    position:absolute;
-    top:var(--hat-top);
-    left:var(--hat-left);
-    width:92px;
-    height:110px;
-    transform: translate(-50%,0) rotate(var(--hat-rotate)) scale(var(--hat-scale));
-    transform-origin: bottom center;
-    pointer-events:none;
-    z-index:4;
-    opacity:.65;
-    transition: opacity .35s ease;
-    animation: hatTargetPulse 1.8s ease-in-out infinite;
-  }
-  .hat-target.filled{ opacity:0; animation:none; }
-  @keyframes hatTargetPulse{
-    0%,100%{ opacity:.5; }
-    50%{ opacity:.85; }
-  }
-  .party-hat-drag{
-    position:absolute;
-    top:255px;
-    left:-16px;
-    width:88px;
-    cursor:grab;
-    touch-action:none;
-    z-index:10;
-    transition: transform .45s cubic-bezier(.2,1.4,.4,1);
-    animation: hatBeckon 1.6s ease-in-out infinite;
-  }
-  .party-hat-drag.dragging{ cursor:grabbing; transition:none; animation:none; }
-  .party-hat-drag.placed{ cursor:default; animation:none; }
-  .party-hat-drag .party-hat-svg{
-    display:block;
-    width:100%;
-    transform: rotate(var(--hat-rotate)) scale(var(--hat-scale));
-    transform-origin: bottom center;
-    filter: drop-shadow(0 6px 8px rgba(0,0,0,.18));
-  }
-  @keyframes hatBeckon{
-    0%,100%{ transform: translate(0,0); }
-    50%{ transform: translate(4px,-8px); }
-  }
+
   /* dev/test toggle */
   .test-toggle{
     position:fixed;
@@ -957,15 +1162,40 @@
 
 <!-- ============ SCREEN 4: CAKE ============ -->
 <section class="screen" id="screen-cake">
-  <span class="eyebrow">Bagian favorit semua orang</span>
-  <h2>Waktunya Niup Lilin! 🕯️</h2>
+  <span class="eyebrow" id="cake-eyebrow">Bagian favorit semua orang</span>
+  <h2 id="cake-title">Yuk Hias Kue Ulang Tahunnya Dulu! 🎨🎂</h2>
+  <p class="cake-sub" id="cake-sub">Pilih warna cream & topping favorit kamu — kue buatan kamu sendiri ini juga yang bakal dipakai buat tiup lilin nanti~</p>
+
   <div class="cake-wrap">
-    <div class="candles" id="candles"></div>
-    <div class="cake-body" id="cake-body" role="button" tabindex="0" aria-label="Gigit kuenya">🎂</div>
+    <div class="cake-body" id="cake-body" role="button" tabindex="0" aria-label="Kue ulang tahun, klik buat gigit">
+      <div class="candles" id="candles" style="display:none;"></div>
+      <div class="cake-toppings-layer" id="cake-toppings-layer"></div>
+      <div class="cake-frosting" id="cake-frosting"></div>
+      <div class="cake-sponge"></div>
+      <div class="cake-plate"></div>
+      <div class="cake-shadow"></div>
+    </div>
   </div>
-  <p class="cake-counter" id="cake-counter">🍴 Gigitan: <span id="bite-count">0</span>/8 — klik kuenya, coba digigit~</p>
-  <button class="btn blow-btn" id="btn-blow">🌬️ Tiup Lilinnya</button>
-  <button class="btn secondary relight-btn" id="btn-relight" style="display:none;">🔥 Nyalain Lagi</button>
+
+  <div class="decorate-panel" id="decorate-panel">
+    <p class="decorate-label">🎨 Warna cream kuenya:
+      <button type="button" class="shuffle-btn" id="btn-shuffle">🎲 Acakin</button>
+    </p>
+    <div class="color-swatches" id="color-swatches"></div>
+    <p class="decorate-label">✨ Topping (klik buat nambah ke atas kue):</p>
+    <div class="topping-buttons" id="topping-buttons"></div>
+    <p class="topping-count" id="topping-count">Topping ditambahin: 0/14</p>
+    <div class="decorate-actions">
+      <button class="btn secondary" id="btn-topping-undo">↩️ Hapus Topping Terakhir</button>
+      <button class="btn" id="btn-cake-done">Kuenya Udah Jadi, Lanjut! 🎉</button>
+    </div>
+  </div>
+
+  <div id="candle-panel" style="display:none;">
+    <p class="cake-counter" id="cake-counter">🍴 Gigitan: <span id="bite-count">0</span>/8 — klik kuenya, coba digigit~</p>
+    <button class="btn blow-btn" id="btn-blow">🌬️ Tiup Lilinnya</button>
+    <button class="btn secondary relight-btn" id="btn-relight" style="display:none;">🔥 Nyalain Lagi</button>
+  </div>
 
   <div class="envelope-wrap" id="envelope-wrap">
     <div class="envelope" id="envelope-el" role="button" tabindex="0" aria-label="Buka surat">
@@ -996,11 +1226,8 @@
     TAMBAHIN FOTO NAURA DI SINI:
     1. Taruh file fotonya (jpg/png) di folder yang sama dengan HTML ini, misal "foto-naura.jpg"
     2. Ganti src="foto-naura.jpg" di bawah sesuai nama filenya
-    3. Kalau target topinya (garis putus-putus) belum pas di kepalanya, atur variabel
-       --hat-left / --hat-top / --hat-rotate di CSS class .hat-game-wrap (ada penjelasannya di bagian <style>)
   -->
-  <div class="hat-game-wrap">
-    <p class="hat-hint" id="hat-hint">🎉 Seret topinya ke atas kepala Naura!</p>
+  <div class="photo-wrap">
     <div class="photo-frame" id="photo-frame">
       <img src="foto-naura.jpg" alt="Foto Naura"
         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1008,23 +1235,6 @@
         📸<br>Taruh foto Naura di sini<br>(foto-naura.jpg)
       </div>
       <div class="photo-caption">Naura, 14 Tahun 🎉</div>
-      <svg class="hat-target" id="hat-target" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <polygon points="50,0 15,100 85,100" fill="none" stroke="var(--lavender-deep)" stroke-width="4" stroke-dasharray="7,8"/>
-        <circle cx="50" cy="-6" r="11" fill="none" stroke="var(--lavender-deep)" stroke-width="4" stroke-dasharray="4,6"/>
-        <ellipse cx="50" cy="102" rx="38" ry="7" fill="none" stroke="var(--lavender-deep)" stroke-width="3" stroke-dasharray="5,6"/>
-      </svg>
-    </div>
-    <div class="party-hat-drag" id="party-hat-drag" role="button" tabindex="0" aria-label="Seret topi ulang tahun ke kepala Naura">
-      <svg class="party-hat-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" width="100%">
-        <polygon points="50,0 15,100 85,100" fill="#E17B60"/>
-        <polygon points="50,0 15,100 85,100" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6,8"/>
-        <circle cx="50" cy="30" r="6" fill="#F2B84E"/>
-        <circle cx="35" cy="55" r="6" fill="#F2B84E"/>
-        <circle cx="65" cy="55" r="6" fill="#F2B84E"/>
-        <circle cx="50" cy="80" r="6" fill="#F2B84E"/>
-        <circle cx="50" cy="-6" r="12" fill="#D8B48C"/>
-        <ellipse cx="50" cy="102" rx="38" ry="7" fill="#F0AD94"/>
-      </svg>
     </div>
   </div>
 
@@ -1033,6 +1243,20 @@
     <textarea class="wish-textarea" id="wish-input" rows="3" maxlength="300" placeholder="Tulis harapan kamu di sini..."></textarea>
     <button class="btn" id="btn-wish-send">Kirim Harapan ✨</button>
     <p class="wish-reply" id="wish-reply"></p>
+  </div>
+
+  <div class="rating-wrap" id="rating-wrap">
+    <p class="rating-label">💌 Kasih rating dong buat website kecil ini~</p>
+    <div class="rating-stars" id="rating-stars">
+      <button type="button" class="star-btn" data-star="1" aria-label="1 bintang">★</button>
+      <button type="button" class="star-btn" data-star="2" aria-label="2 bintang">★</button>
+      <button type="button" class="star-btn" data-star="3" aria-label="3 bintang">★</button>
+      <button type="button" class="star-btn" data-star="4" aria-label="4 bintang">★</button>
+      <button type="button" class="star-btn" data-star="5" aria-label="5 bintang">★</button>
+    </div>
+    <textarea class="rating-textarea" id="rating-comment" rows="2" maxlength="200" placeholder="Komentar singkat (opsional)..."></textarea>
+    <button class="btn" id="btn-rating-send">Kirim Rating ⭐</button>
+    <p class="rating-reply" id="rating-reply"></p>
   </div>
 
   <button class="btn secondary" id="btn-replay">🔁 Ulangi dari Awal</button>
@@ -1246,137 +1470,6 @@
       document.body.appendChild(piece);
       setTimeout(()=>piece.remove(), 4500);
     }
-  }
-
-  /* ================= GAME: SERET TOPI KE KEPALA ================= */
-  const hatEl = document.getElementById('party-hat-drag');
-  const hatTargetEl = document.getElementById('hat-target');
-  const hatHintEl = document.getElementById('hat-hint');
-  let hatPlaced = false;
-  let hatDragging = false;
-  let hatTx = 0, hatTy = 0; // total translate yang udah "nempel" di topi
-  let hatStartX = 0, hatStartY = 0;
-  // seberapa banyak toleransi jarak (px) di LUAR area target yang masih dianggap "pas".
-  // makin gede angkanya, makin gampang/longgar.
-  const HAT_SNAP_PAD = 40;
-
-  function getPointXY(e){
-    // ambil koordinat dari touch event ATAU mouse/pointer event, biar semua jenis device kepegang
-    if(e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    if(e.changedTouches && e.changedTouches.length) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-    return { x: e.clientX, y: e.clientY };
-  }
-
-  function rectsClose(r1, r2, pad){
-    // true kalau kotak topi & kotak target "beririsan" (dengan toleransi pad px di sekelilingnya)
-    return !(
-      r1.right + pad < r2.left ||
-      r1.left - pad > r2.right ||
-      r1.bottom + pad < r2.top ||
-      r1.top - pad > r2.bottom
-    );
-  }
-
-  function celebrateHat(){
-    hatHintEl.textContent = '🎉 Yeay, pas banget! Selamat ulang tahun, Naura!';
-    hatHintEl.classList.add('done');
-    burstConfetti(90);
-    for(let i=0;i<5;i++){
-      setTimeout(()=>{
-        spawnFirework(20 + Math.random()*60, 15 + Math.random()*35);
-      }, i*220);
-    }
-  }
-
-  function hatCenter(el){
-    const r = el.getBoundingClientRect();
-    return { x: r.left + r.width/2, y: r.top + r.height/2 };
-  }
-
-  function placeHatAtTarget(){
-    const hc = hatCenter(hatEl);
-    const tc = hatCenter(hatTargetEl);
-    hatTx += (tc.x - hc.x);
-    hatTy += (tc.y - hc.y);
-    hatEl.style.transform = `translate(${hatTx}px, ${hatTy}px)`;
-    hatPlaced = true;
-    hatEl.classList.add('placed');
-    hatTargetEl.classList.add('filled');
-    celebrateHat();
-  }
-
-  function hatDragStart(e){
-    if(hatPlaced) return;
-    hatDragging = true;
-    hatEl.classList.add('dragging');
-    const p = getPointXY(e);
-    hatStartX = p.x;
-    hatStartY = p.y;
-    if(e.pointerId !== undefined){
-      try{ hatEl.setPointerCapture(e.pointerId); }catch(err){}
-    }
-    e.preventDefault();
-  }
-  function hatDragMove(e){
-    if(!hatDragging) return;
-    const p = getPointXY(e);
-    const dx = p.x - hatStartX;
-    const dy = p.y - hatStartY;
-    hatEl.style.transform = `translate(${hatTx+dx}px, ${hatTy+dy}px)`;
-    e.preventDefault();
-  }
-  function hatDragEnd(e){
-    if(!hatDragging) return;
-    hatDragging = false;
-    hatEl.classList.remove('dragging');
-    const p = getPointXY(e);
-    const dx = p.x - hatStartX;
-    const dy = p.y - hatStartY;
-    hatTx += dx;
-    hatTy += dy;
-    hatEl.style.transform = `translate(${hatTx}px, ${hatTy}px)`;
-
-    // cek "beririsan" antara kotak topi & kotak target, bukan cuma titik tengah -> lebih gampang kena
-    const hatRect = hatEl.getBoundingClientRect();
-    const targetRect = hatTargetEl.getBoundingClientRect();
-
-    if(rectsClose(hatRect, targetRect, HAT_SNAP_PAD)){
-      placeHatAtTarget();
-    } else {
-      hatTx = 0; hatTy = 0;
-      hatEl.style.transform = 'translate(0,0)';
-    }
-  }
-
-  hatEl.addEventListener('pointerdown', hatDragStart);
-  window.addEventListener('pointermove', hatDragMove);
-  window.addEventListener('pointerup', hatDragEnd);
-  window.addEventListener('pointercancel', hatDragEnd);
-  // fallback buat browser/webview yang Pointer Event-nya rewel (misal in-app browser WA/IG)
-  hatEl.addEventListener('touchstart', hatDragStart, { passive:false });
-  window.addEventListener('touchmove', hatDragMove, { passive:false });
-  window.addEventListener('touchend', hatDragEnd);
-  window.addEventListener('touchcancel', hatDragEnd);
-  hatEl.addEventListener('mousedown', hatDragStart);
-  window.addEventListener('mousemove', hatDragMove);
-  window.addEventListener('mouseup', hatDragEnd);
-
-  hatEl.addEventListener('keydown', function(e){
-    if((e.key === 'Enter' || e.key === ' ') && !hatPlaced){
-      e.preventDefault();
-      placeHatAtTarget();
-    }
-  });
-
-  function resetHatGame(){
-    hatPlaced = false;
-    hatDragging = false;
-    hatTx = 0; hatTy = 0;
-    hatEl.classList.remove('placed','dragging');
-    hatEl.style.transform = 'translate(0,0)';
-    hatTargetEl.classList.remove('filled');
-    hatHintEl.classList.remove('done');
-    hatHintEl.textContent = '🎉 Seret topinya ke atas kepala Naura!';
   }
 
   /* ================= GIFT BOX -> GAME ================= */
@@ -1673,6 +1766,155 @@
   const relightBtn = document.getElementById('btn-relight');
   let candlesBlown = false;
 
+  /* ================= GAME: HIAS KUE (sebelum tiup lilin) ================= */
+  const cakeVisualEl = document.getElementById('cake-body');
+  const cakeFrostingEl = document.getElementById('cake-frosting');
+  const cakeToppingsLayerEl = document.getElementById('cake-toppings-layer');
+  const colorSwatchesEl = document.getElementById('color-swatches');
+  const toppingButtonsEl = document.getElementById('topping-buttons');
+  const toppingCountEl = document.getElementById('topping-count');
+  const decoratePanelEl = document.getElementById('decorate-panel');
+  const candlePanelEl = document.getElementById('candle-panel');
+  const cakeTitleEl = document.getElementById('cake-title');
+  const cakeSubEl = document.getElementById('cake-sub');
+  const btnCakeDone = document.getElementById('btn-cake-done');
+  const btnToppingUndo = document.getElementById('btn-topping-undo');
+  const btnShuffle = document.getElementById('btn-shuffle');
+
+  const FROSTING_COLORS = [
+    { name: 'Pink', hex: '#F7C9DE' },
+    { name: 'Lavender', hex: '#D9C6F0' },
+    { name: 'Krem', hex: '#FCEBD3' },
+    { name: 'Coklat susu', hex: '#D8A46B' },
+    { name: 'Mint', hex: '#C7EAD9' },
+    { name: 'Putih', hex: '#FFFFFF' }
+  ];
+  const TOPPING_OPTIONS = ['🍒','🍓','🍫','⭐','🌈','✨','🍩','🧁'];
+  const MAX_TOPPINGS = 14;
+
+  let selectedFrosting = FROSTING_COLORS[0].hex;
+  let placedToppings = []; // { emoji, left, rot }
+  let cakeDecorated = false;
+
+  colorSwatchesEl.innerHTML = FROSTING_COLORS.map((c, i) =>
+    `<button type="button" class="swatch${i===0?' active':''}" style="background:${c.hex}" data-color="${c.hex}" aria-label="Warna ${c.name}"></button>`
+  ).join('');
+
+  toppingButtonsEl.innerHTML = TOPPING_OPTIONS.map(t =>
+    `<button type="button" class="topping-btn" data-topping="${t}" aria-label="Tambah topping ${t}">${t}</button>`
+  ).join('');
+
+  function applyFrosting(hex){
+    selectedFrosting = hex;
+    cakeVisualEl.style.setProperty('--frosting-color', hex);
+    colorSwatchesEl.querySelectorAll('.swatch').forEach(sw=>{
+      sw.classList.toggle('active', sw.dataset.color === hex);
+    });
+  }
+  applyFrosting(selectedFrosting);
+
+  function jiggleCake(){
+    cakeVisualEl.classList.remove('jiggle');
+    void cakeVisualEl.offsetWidth; // restart animasi
+    cakeVisualEl.classList.add('jiggle');
+  }
+
+  function spawnSparkleAt(x, y){
+    const icons = ['✨','⭐','💫'];
+    for(let i=0;i<3;i++){
+      const s = document.createElement('div');
+      s.className = 'cake-sparkle';
+      s.textContent = icons[Math.floor(Math.random()*icons.length)];
+      s.style.left = (x + (Math.random()*36-18)) + 'px';
+      s.style.top = (y + (Math.random()*10-5)) + 'px';
+      s.style.animationDelay = (i*0.05) + 's';
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(), 750);
+    }
+  }
+
+  function renderToppings(){
+    cakeToppingsLayerEl.innerHTML = placedToppings.map(t =>
+      `<span class="cake-topping-piece" style="left:${t.left}px; bottom:${t.bottom}px; --tp-rot:${t.rot}deg;">${t.emoji}</span>`
+    ).join('');
+    toppingCountEl.textContent = `Topping ditambahin: ${placedToppings.length}/${MAX_TOPPINGS}`;
+  }
+
+  colorSwatchesEl.addEventListener('click', function(e){
+    const btn = e.target.closest('.swatch');
+    if(!btn) return;
+    applyFrosting(btn.dataset.color);
+    const r = btn.getBoundingClientRect();
+    spawnSparkleAt(r.left + r.width/2, r.top);
+  });
+
+  toppingButtonsEl.addEventListener('click', function(e){
+    const btn = e.target.closest('.topping-btn');
+    if(!btn) return;
+    if(placedToppings.length >= MAX_TOPPINGS) return;
+    const layerWidth = cakeToppingsLayerEl.clientWidth || 196;
+    placedToppings.push({
+      emoji: btn.dataset.topping,
+      left: Math.random()*(layerWidth-24),
+      bottom: Math.random()*10,
+      rot: Math.random()*36 - 18
+    });
+    renderToppings();
+    jiggleCake();
+    btn.classList.remove('pulse');
+    void btn.offsetWidth;
+    btn.classList.add('pulse');
+    const r = btn.getBoundingClientRect();
+    spawnSparkleAt(r.left + r.width/2, r.top);
+  });
+
+  btnToppingUndo.addEventListener('click', function(){
+    placedToppings.pop();
+    renderToppings();
+  });
+
+  btnShuffle.addEventListener('click', function(){
+    const randomColor = FROSTING_COLORS[Math.floor(Math.random()*FROSTING_COLORS.length)];
+    applyFrosting(randomColor.hex);
+    const count = 4 + Math.floor(Math.random()*5);
+    const layerWidth = cakeToppingsLayerEl.clientWidth || 196;
+    placedToppings = [];
+    for(let i=0;i<count;i++){
+      placedToppings.push({
+        emoji: TOPPING_OPTIONS[Math.floor(Math.random()*TOPPING_OPTIONS.length)],
+        left: Math.random()*(layerWidth-24),
+        bottom: Math.random()*10,
+        rot: Math.random()*36 - 18
+      });
+    }
+    renderToppings();
+    jiggleCake();
+    burstConfetti(16);
+  });
+
+  btnCakeDone.addEventListener('click', function(){
+    if(cakeDecorated) return;
+    cakeDecorated = true;
+    decoratePanelEl.style.display = 'none';
+    candlesWrap.style.display = 'flex';
+    candlePanelEl.style.display = 'block';
+    cakeTitleEl.textContent = 'Waktunya Niup Lilin! 🕯️';
+    cakeSubEl.textContent = 'Nih, kue hasil hiasan kamu sendiri — yuk tiup lilinnya!';
+    burstConfetti(30);
+  });
+
+  function resetCakeDecoration(){
+    cakeDecorated = false;
+    placedToppings = [];
+    renderToppings();
+    applyFrosting(FROSTING_COLORS[0].hex);
+    decoratePanelEl.style.display = '';
+    candlesWrap.style.display = 'none';
+    candlePanelEl.style.display = 'none';
+    cakeTitleEl.textContent = 'Yuk Hias Kue Ulang Tahunnya Dulu! 🎨🎂';
+    cakeSubEl.textContent = 'Pilih warna cream & topping favorit kamu — kue buatan kamu sendiri ini juga yang bakal dipakai buat tiup lilin nanti~';
+  }
+
   /* ============= KLIK KUE: GIGIT / NAMBAH-BERKURANG ============= */
   const cakeBodyEl = document.getElementById('cake-body');
   const cakeCounterEl = document.getElementById('cake-counter');
@@ -1693,6 +1935,7 @@
   }
 
   function nibbleCake(){
+    if(!cakeDecorated) return; // belum kelar dihias, belum bisa digigit
     if(cakeBites >= MAX_BITES){
       cakeBites = 0; // kuenya nambah lagi, baru!
     } else {
@@ -1838,11 +2081,12 @@
     roadmapTimers.forEach(t => clearTimeout(t));
     roadmapTimers = [];
     roadmapItems.forEach(item => item.classList.remove('revealed','line-grown'));
-    resetHatGame();
+    resetCakeDecoration();
     resetRunawayGame();
     wishInput.value = '';
     wishReply.classList.remove('show');
     wishReply.textContent = '';
+    resetRating();
     gameStarted = false;
     revealBtn.disabled = false;
     showScreen('countdown');
@@ -1922,6 +2166,111 @@
     }
   });
 
+  /* ================= RATING WEB ================= */
+  /*
+    CARA BIAR RATING NAURA KESIMPEN DAN BISA KAMU CEK DI GOOGLE FORM:
+    (caranya sama persis kayak bagian HARAPAN di atas)
+
+    1. Buka forms.google.com, buat form baru (boleh form yang sama dengan
+       form "Harapan Naura" di atas, tinggal tambahin pertanyaan baru di situ,
+       atau bikin form baru khusus rating — bebas).
+    2. Tambahin 2 pertanyaan:
+       - "Rating (1-5)" -> tipe "Jawaban singkat"
+       - "Komentar" -> tipe "Paragraf" (boleh gak wajib diisi)
+    3. Klik titik tiga kanan atas > "Get pre-filled link".
+    4. Isi jawaban contoh di kedua pertanyaan itu, klik "Get link".
+    5. Dari link yang muncul, cari 2 bagian "entry.XXXXXXXXX=" -> itu ID
+       masing-masing pertanyaan (satu buat rating, satu buat komentar).
+       Contoh: ...?entry.111111111=5&entry.222222222=bagus
+       Berarti entry.111111111 = ID buat Rating, entry.222222222 = ID buat Komentar.
+    6. Isi 3 variabel di bawah ini pakai punya kamu:
+       - RATING_FORM_ACTION: sama kayak WISH_FORM_ACTION di atas (link .../formResponse),
+         boleh disamain sama form Harapan kalau pertanyaannya digabung ke situ.
+       - RATING_STAR_ENTRY_ID: ID pertanyaan Rating.
+       - RATING_COMMENT_ENTRY_ID: ID pertanyaan Komentar.
+    7. Ratingnya otomatis masuk ke tab "Responses" di Google Form kamu, cek kapan aja.
+
+    Kalau dibiarin kosong, fiturnya tetep jalan normal (tetep ada ucapan terima kasih),
+    cuma ratingnya gak kesimpen ke mana-mana.
+  */
+  const RATING_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdF2uIX836R7KH3GHwulsYnZa372KxCbqMQZygNWS12bUXZfg/formResponse';
+  const RATING_STAR_ENTRY_ID = 'entry.1926682619';
+  const RATING_COMMENT_ENTRY_ID = 'entry.1141336549';
+
+  function saveRatingToForm(stars, comment){
+    if(!RATING_FORM_ACTION || !RATING_STAR_ENTRY_ID) return; // belum di-setting, skip diem-diem
+    const body = new URLSearchParams();
+    body.append(RATING_STAR_ENTRY_ID, String(stars));
+    if(RATING_COMMENT_ENTRY_ID && comment){
+      body.append(RATING_COMMENT_ENTRY_ID, comment);
+    }
+    fetch(RATING_FORM_ACTION, {
+      method: 'POST',
+      mode: 'no-cors', // Google Form gak ngasih izin CORS, ini normal & aman
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    }).catch(()=>{ /* diemin kalau gagal (misal lagi offline), gak ganggu pengalaman Naura */ });
+  }
+
+  const ratingStarsWrap = document.getElementById('rating-stars');
+  const ratingCommentEl = document.getElementById('rating-comment');
+  const ratingBtn = document.getElementById('btn-rating-send');
+  const ratingReplyEl = document.getElementById('rating-reply');
+  const starButtons = Array.from(ratingStarsWrap.querySelectorAll('.star-btn'));
+  let selectedRating = 0;
+  let ratingSent = false;
+
+  const RATING_REPLIES = {
+    1: 'Waduh, makasih udah jujur ya~ next dibikinin yang lebih seru lagi 🙏',
+    2: 'Noted! Makasih ratingnya, masih banyak yang bisa diperbaikin ya 😅',
+    3: 'Makasih ratingnya! Lumayan lah ya, next dibikin lebih kece lagi ✨',
+    4: 'Yeay makasih banyak! Seneng deh kalo kamu suka~ 🥰',
+    5: 'WAAA bintang 5! Makasih banyak Naura, seneng banget! 🌟🎉'
+  };
+
+  function renderStars(hoverVal){
+    const val = hoverVal !== undefined ? hoverVal : selectedRating;
+    starButtons.forEach(btn=>{
+      const n = Number(btn.dataset.star);
+      btn.classList.toggle('active', n <= val);
+    });
+  }
+
+  starButtons.forEach(btn=>{
+    btn.addEventListener('mouseenter', ()=> renderStars(Number(btn.dataset.star)));
+    btn.addEventListener('mouseleave', ()=> renderStars());
+    btn.addEventListener('click', function(){
+      selectedRating = Number(btn.dataset.star);
+      renderStars();
+      btn.classList.remove('bounce');
+      void btn.offsetWidth;
+      btn.classList.add('bounce');
+    });
+  });
+
+  ratingBtn.addEventListener('click', function(){
+    if(!selectedRating){
+      ratingReplyEl.textContent = 'Pilih bintangnya dulu yaa~ 😊';
+      ratingReplyEl.classList.add('show');
+      return;
+    }
+    saveRatingToForm(selectedRating, ratingCommentEl.value.trim());
+    ratingSent = true;
+    ratingReplyEl.classList.remove('show');
+    void ratingReplyEl.offsetWidth;
+    ratingReplyEl.textContent = RATING_REPLIES[selectedRating] || 'Makasih banyak ratingnya! 🌟';
+    ratingReplyEl.classList.add('show');
+    burstConfetti(selectedRating >= 4 ? 26 : 12);
+  });
+
+  function resetRating(){
+    selectedRating = 0;
+    ratingSent = false;
+    renderStars();
+    ratingCommentEl.value = '';
+    ratingReplyEl.classList.remove('show');
+    ratingReplyEl.textContent = '';
+  }
 
   /* ================= MUSIK (isi file kamu sendiri) ================= */
   const bgMusic = document.getElementById('bg-music');
