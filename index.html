@@ -359,6 +359,42 @@
     margin-top:5px;
     display:block;
   }
+  /* ---------- RUNAWAY BUTTON GAME (ngeselin) ---------- */
+  .runaway-area{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    height:260px;
+    margin:0 auto 16px;
+    background:var(--white);
+    border-radius:24px;
+    border:3px dashed var(--pink-mid);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  #btn-runaway{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    transition: top .22s ease, left .22s ease;
+    white-space:nowrap;
+    touch-action:none;
+  }
+  #btn-runaway.caught{
+    transition: top .35s cubic-bezier(.2,1.4,.4,1), left .35s cubic-bezier(.2,1.4,.4,1);
+  }
+  .runaway-hint{
+    min-height:1.3em;
+    font-weight:600;
+    color:var(--pink-deep);
+    margin-bottom:6px;
+  }
+  .runaway-count-wrap{
+    font-size:.85rem;
+    opacity:.7;
+  }
+
   .wish-wrap{
     margin-top:36px;
     max-width:440px;
@@ -896,6 +932,19 @@
   <button class="btn" id="btn-to-cake" style="margin-top:22px;">Lanjut ke Kue 🎂</button>
 </section>
 
+<!-- ============ SCREEN 3.7: GAME NGESELIN (TANGKAP TOMBOL) ============ -->
+<section class="screen" id="screen-runaway">
+  <span class="eyebrow">Tantangan Receh Dulu</span>
+  <h2>Tangkap Tombolnya Kalau Bisa 😏</h2>
+  <p class="sub">Sebelum lanjut ke kue, coba klik/tap tombolnya. Gampang kok. (Bohong)</p>
+  <div class="runaway-area" id="runaway-area">
+    <button class="btn" id="btn-runaway">Tangkap Aku! 🏃‍♀️</button>
+  </div>
+  <p class="runaway-hint" id="runaway-hint">👆 ayo dicoba, jangan nyerah!</p>
+  <p class="runaway-count-wrap">Gagal ditangkap: <span id="runaway-count">0</span> kali</p>
+  <button class="btn secondary" id="btn-after-runaway" style="display:none; margin-top:8px;">Oke Lanjut ke Kue 🎂</button>
+</section>
+
 <!-- ============ SCREEN 4: CAKE ============ -->
 <section class="screen" id="screen-cake">
   <span class="eyebrow">Bagian favorit semua orang</span>
@@ -1013,6 +1062,7 @@
     game: document.getElementById('screen-game'),
     calendar: document.getElementById('screen-calendar'),
     roadmap: document.getElementById('screen-roadmap'),
+    runaway: document.getElementById('screen-runaway'),
     cake: document.getElementById('screen-cake'),
     end: document.getElementById('screen-end'),
   };
@@ -1196,7 +1246,7 @@
   let hatDragging = false;
   let hatTx = 0, hatTy = 0; // total translate yang udah "nempel" di topi
   let hatPointerStartX = 0, hatPointerStartY = 0;
-  const HAT_SNAP_DIST = 10000; // px, seberapa deket biar dianggap "pas" (dilonggarin biar gak perlu presisi banget)
+  const HAT_SNAP_DIST = 100; // px, seberapa deket biar dianggap "pas" (dilonggarin biar gak perlu presisi banget)
 
   function hatCenter(el){
     const r = el.getBoundingClientRect();
@@ -1262,9 +1312,9 @@
     }
   }
   hatEl.addEventListener('pointerdown', hatPointerDown);
-  hatEl.addEventListener('pointermove', hatPointerMove);
-  hatEl.addEventListener('pointerup', hatPointerUp);
-  hatEl.addEventListener('pointercancel', hatPointerUp);
+  window.addEventListener('pointermove', hatPointerMove);
+  window.addEventListener('pointerup', hatPointerUp);
+  window.addEventListener('pointercancel', hatPointerUp);
   hatEl.addEventListener('keydown', function(e){
     if((e.key === 'Enter' || e.key === ' ') && !hatPlaced){
       e.preventDefault();
@@ -1467,6 +1517,99 @@
   }
 
   document.getElementById('btn-to-cake').addEventListener('click', function(){
+    showScreen('runaway');
+  });
+
+  /* ================= GAME NGESELIN: TANGKAP TOMBOL ================= */
+  const RUNAWAY_DODGES_NEEDED = 6;
+  let runawayDodges = 0;
+  let runawayCaught = false;
+  const runawayArea = document.getElementById('runaway-area');
+  const runawayBtn = document.getElementById('btn-runaway');
+  const runawayCountEl = document.getElementById('runaway-count');
+  const runawayHintEl = document.getElementById('runaway-hint');
+  const btnAfterRunaway = document.getElementById('btn-after-runaway');
+  const runawayTaunts = [
+    'Yah, meleset~ 😝',
+    'Hehe, kurang cepet!',
+    'Eh gagal lagi, coba lagi~',
+    'Deket, tapi belum kena!',
+    'Wkwk lucu banget usahanya',
+    'Sabar... dikit lagi (mungkin)',
+    'Ini emang sengaja ngejauh kok 😏',
+    'Yaelah gitu doang gabisa~'
+  ];
+
+  function moveRunawayBtn(){
+    const areaRect = runawayArea.getBoundingClientRect();
+    const btnRect = runawayBtn.getBoundingClientRect();
+    const pad = 10;
+    const maxLeft = Math.max(areaRect.width - btnRect.width - pad, pad);
+    const maxTop = Math.max(areaRect.height - btnRect.height - pad, pad);
+    const newLeft = pad + Math.random() * (maxLeft - pad);
+    const newTop = pad + Math.random() * (maxTop - pad);
+    runawayBtn.style.transform = 'none';
+    runawayBtn.style.left = newLeft + 'px';
+    runawayBtn.style.top = newTop + 'px';
+  }
+
+  function runawayDodge(){
+    runawayDodges++;
+    runawayCountEl.textContent = runawayDodges;
+    runawayHintEl.textContent = runawayTaunts[Math.floor(Math.random()*runawayTaunts.length)];
+    moveRunawayBtn();
+  }
+
+  function runawayCatch(){
+    runawayCaught = true;
+    runawayBtn.classList.add('caught');
+    runawayBtn.textContent = 'Ketangkep! 🎉';
+    runawayHintEl.textContent = 'Wih, akhirnya berhasil juga! Selamat~ 🎉';
+    burstConfetti(60);
+    btnAfterRunaway.style.display = 'inline-block';
+  }
+
+  function resetRunawayGame(){
+    runawayDodges = 0;
+    runawayCaught = false;
+    runawayCountEl.textContent = '0';
+    runawayHintEl.textContent = '👆 ayo dicoba, jangan nyerah!';
+    runawayBtn.textContent = 'Tangkap Aku! 🏃‍♀️';
+    runawayBtn.classList.remove('caught');
+    runawayBtn.style.left = '';
+    runawayBtn.style.top = '';
+    runawayBtn.style.transform = 'translate(-50%,-50%)';
+    btnAfterRunaway.style.display = 'none';
+  }
+
+  runawayBtn.addEventListener('pointerenter', function(e){
+    if(runawayCaught) return;
+    if(e.pointerType === 'mouse' && runawayDodges < RUNAWAY_DODGES_NEEDED){
+      runawayDodge();
+    }
+  });
+  runawayBtn.addEventListener('pointerdown', function(e){
+    if(runawayCaught) return;
+    e.preventDefault();
+    if(runawayDodges < RUNAWAY_DODGES_NEEDED){
+      runawayDodge();
+    } else {
+      runawayCatch();
+    }
+  });
+  runawayBtn.addEventListener('keydown', function(e){
+    if(runawayCaught) return;
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      if(runawayDodges < RUNAWAY_DODGES_NEEDED){
+        runawayDodge();
+      } else {
+        runawayCatch();
+      }
+    }
+  });
+
+  btnAfterRunaway.addEventListener('click', function(){
     showScreen('cake');
   });
 
@@ -1594,6 +1737,7 @@
     roadmapTimers = [];
     roadmapItems.forEach(item => item.classList.remove('revealed','line-grown'));
     resetHatGame();
+    resetRunawayGame();
     wishInput.value = '';
     wishReply.classList.remove('show');
     wishReply.textContent = '';
